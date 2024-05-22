@@ -23,7 +23,7 @@ export const Home = () => {
     const [markerDatas, setMarkerDatas] = useState<MarkerDataType[]>([]);
     const mapRef = useRef<any>(null);
     const markersRef = useRef<any[]>([]);
-    const clickedMarkerAndInfoWindowRef = useRef<[any, any] | null>(null);
+    const clickedMarkerAndOverlayRef = useRef<[any, any] | null>(null);
 
     useEffect(() => {
         let mapContainer = document.getElementById('map');
@@ -44,10 +44,10 @@ export const Home = () => {
 
         // 지도를 클릭하면 현재 활성화된 인포윈도우를 닫고, 상태를 초기화하는 이벤트 리스너 추가
         window.kakao.maps.event.addListener(mapInstance, 'click', () => {
-            if (clickedMarkerAndInfoWindowRef.current) {
-                const curInfoWindow = clickedMarkerAndInfoWindowRef.current[1];
-                curInfoWindow.close();
-                clickedMarkerAndInfoWindowRef.current = null;
+            if (clickedMarkerAndOverlayRef.current) {
+                const curOverlay = clickedMarkerAndOverlayRef.current[1];
+                curOverlay.setMap(null);
+                clickedMarkerAndOverlayRef.current = null;
             }
         });
 
@@ -87,34 +87,34 @@ export const Home = () => {
                 image: markerImage // 마커 이미지
             });
 
-            // 인포윈도우를 생성합니다
-            const infowindow = new window.kakao.maps.InfoWindow({
-                content: `<div style="padding:5px;">${data.pfct_nm}</div>`, // 인포윈도우에 표출될 내용
+            // 마커 위에 커스텀오버레이를 표시합니다
+            const overlayContent = `<div style="padding:5px;">${data.pfct_nm}</div>`;
+            const overlay = new window.kakao.maps.CustomOverlay({
+                content: overlayContent,
+                position: marker.getPosition()
             });
 
             // 마커에 마우스오버 이벤트를 등록합니다
             window.kakao.maps.event.addListener(marker, 'mouseover', () => {
-                infowindow.open(mapRef.current, marker);
+                overlay.setMap(mapRef.current);
             });
 
             // 마커에 마우스아웃 이벤트를 등록합니다
             window.kakao.maps.event.addListener(marker, 'mouseout', () => {
-                if (!clickedMarkerAndInfoWindowRef.current || clickedMarkerAndInfoWindowRef.current[0] !== marker) {
-                    infowindow.close();
+                if (!clickedMarkerAndOverlayRef.current || clickedMarkerAndOverlayRef.current[0] !== marker) {
+                    overlay.setMap(null);
                 }
             });
 
             // 마커에 클릭 이벤트를 등록합니다
             window.kakao.maps.event.addListener(marker, 'click', () => {
-                if (clickedMarkerAndInfoWindowRef.current) {
-                    const curInfoWindow = clickedMarkerAndInfoWindowRef.current[1];
-                    if (curInfoWindow) {
-                        curInfoWindow.close();
-                    }
+                if (clickedMarkerAndOverlayRef.current) {
+                    const curOverlay = clickedMarkerAndOverlayRef.current[1];
+                    curOverlay && curOverlay.setMap(null);
                 }
 
-                infowindow.open(mapRef.current, marker);
-                clickedMarkerAndInfoWindowRef.current = [marker, infowindow];
+                overlay.setMap(mapRef.current);
+                clickedMarkerAndOverlayRef.current = [marker, overlay];
             });
 
             marker.setMap(mapRef.current); // 마커를 지도에 추가합니다
