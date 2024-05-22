@@ -46,7 +46,7 @@ const overlayComponentToString = (props: OverlayProps) => {
 }
 
 export const Home = () => {
-    const { paramFacilityId } = useParams();
+    const { paramFacilityId } = useParams();        // 없으면 null 이 아니라 undefined 이다.
     const [markerDatas, setMarkerDatas] = useState<MarkerDataType[]>([]);
     const mapRef = useRef<any>(null);
     const markersRef = useRef<any[]>([]);
@@ -160,7 +160,7 @@ export const Home = () => {
     return (
         <>
             <StyledMapContainer id="map" ></StyledMapContainer>
-            <SideBar></SideBar>
+            <SideBar ></SideBar>
         </>
     );
 }
