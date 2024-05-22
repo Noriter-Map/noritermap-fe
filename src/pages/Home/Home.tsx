@@ -1,5 +1,6 @@
 import {StyledMapContainer} from "./Home.style";
 import {useEffect} from "react";
+import {SideBar} from "../../components/SideBar/SideBar";
 
 declare global {
     interface Window {
@@ -31,8 +32,9 @@ export const Home = () => {
 
 
     return (
-        <StyledMapContainer id="map">
-
-        </StyledMapContainer>
+        <>
+            <StyledMapContainer id="map"></StyledMapContainer>
+            <SideBar></SideBar>
+        </>
     )
 }
