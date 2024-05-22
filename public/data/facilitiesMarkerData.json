@@ -6,7 +6,10 @@
       "lot": "126.9460140",
       "pfct_nm": "삼성농아원 실내놀이터",
       "addr": "서울 동작구 양녕로30길 19-4, 삼성농아원",
-      "instl_place_cd_nm": "아동복지시설"
+      "instl_place_cd_nm": "아동복지시설",
+      "rating": 4.3,
+      "review_count": 21,
+      "zip": "07027"
     },
     {
       "facility_id": "729",
@@ -14,7 +17,10 @@
       "lot": "126.9400330",
       "pfct_nm": "상도 푸르지오 클라베뉴 유아놀이터(어린이집앞)",
       "addr": "서울 동작구 양녕로25사길 45-13",
-      "instl_place_cd_nm": "주택단지"
+      "instl_place_cd_nm": "주택단지",
+      "rating": 4.3,
+      "review_count": 21,
+      "zip": "07027"
     },
     {
       "facility_id": "730",
@@ -22,7 +28,10 @@
       "lot": "126.9460140",
       "pfct_nm": "상도 푸르지오 클라베뉴 어린이놀이터2(101동앞)",
       "addr": "서울 동작구 양녕로25사길 45-13",
-      "instl_place_cd_nm": "주택단지"
+      "instl_place_cd_nm": "주택단지",
+      "rating": 4.3,
+      "review_count": 21,
+      "zip": "07027"
     },
     {
       "facility_id": "731",
@@ -30,7 +39,10 @@
       "lot": "126.9400330",
       "pfct_nm": "상도 푸르지오 클라베뉴 어린이놀이터2(101동앞)",
       "addr": "서울 동작구 양녕로25사길 45-13",
-      "instl_place_cd_nm": "주택단지"
+      "instl_place_cd_nm": "주택단지",
+      "rating": 4.3,
+      "review_count": 21,
+      "zip": "07027"
     },
     {
       "facility_id": "1918",
@@ -38,7 +50,10 @@
       "lot": "126.9229889",
       "pfct_nm": "동작키즈카페(서울형 키즈카페) 대방동점",
       "addr": "서울특별시 동작구 여의대방로36길 11 (대방동), 4층",
-      "instl_place_cd_nm": "아동복지시설"
+      "instl_place_cd_nm": "아동복지시설",
+      "rating": 4.3,
+      "review_count": 21,
+      "zip": "07027"
     },
     {
       "facility_id": "2895",
@@ -46,7 +61,10 @@
       "lot": "126.9599576",
       "pfct_nm": "서울은로유치원",
       "addr": "서울특별시 동작구 서달로 115 (흑석동)",
-      "instl_place_cd_nm": "유치원"
+      "instl_place_cd_nm": "유치원",
+      "rating": 4.3,
+      "review_count": 21,
+      "zip": "07027"
     }
   ]
 }

@@ -3,6 +3,9 @@ import { useEffect, useState, useRef } from "react";
 import { SideBar } from "../../components/SideBar/SideBar";
 import { getFacilitiesMarkerData } from "../../apis/getFacilitiesMarkerData";
 import MapPin from '../../assets/Map_pin.svg';
+import {renderToStaticMarkup} from "react-dom/server";
+import {Overlay} from "../../components/Overlay/Overlay";
+import {useNavigate, useParams} from "react-router-dom";
 
 declare global {
     interface Window {
@@ -11,19 +14,44 @@ declare global {
 }
 
 interface MarkerDataType {
-    facility_id: string,
-    lat: string,
-    lot: string,
-    pfct_nm: string,
-    addr: string,
-    instl_place_cd_nm: string,
+    facility_id: string;
+    lat: string;
+    lot: string;
+    pfct_nm: string;
+    addr: string;
+    instl_place_cd_nm: string;
+    rating: number;
+    review_count: number;
+    zip: string;
+}
+
+interface OverlayProps {
+    facility_id: string;
+    pfct_nm: string;
+    rating: number;
+    review_count: number;
+    addr: string;
+    zip: string;
+}
+
+const overlayComponentToString = (props: OverlayProps) => {
+    return renderToStaticMarkup(<Overlay
+        facility_id={props.facility_id}
+        pfct_nm={props.pfct_nm}
+        rating={props.rating}
+        review_count={props.review_count}
+        addr={props.addr}
+        zip={props.zip}
+    />);
 }
 
 export const Home = () => {
+    const { paramFacilityId } = useParams();
     const [markerDatas, setMarkerDatas] = useState<MarkerDataType[]>([]);
     const mapRef = useRef<any>(null);
     const markersRef = useRef<any[]>([]);
     const clickedMarkerAndOverlayRef = useRef<[any, any] | null>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         let mapContainer = document.getElementById('map');
@@ -69,8 +97,8 @@ export const Home = () => {
     useEffect(() => {
         if (markerDatas.length === 0 || !mapRef.current) return;
 
-        // 마커가 이미 생성된 경우 추가 생성하지 않음
-        if (markersRef.current.length > 0) return;
+        // // 마커가 이미 생성된 경우 추가 생성하지 않음
+        // if (markersRef.current.length > 0) return;
 
         // 새로운 마커들을 생성하고 지도에 추가
         const newMarkers = markerDatas.map(data => {
@@ -86,24 +114,21 @@ export const Home = () => {
                 title: data.pfct_nm, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
                 image: markerImage // 마커 이미지
             });
+            marker.facilityId = data.facility_id;       // 마커 객체에 시설 ID 를 저장한다.
 
-            // 마커 위에 커스텀오버레이를 표시합니다
-            const overlayContent = `<div style="padding:5px;">${data.pfct_nm}</div>`;
+            const overlayProps: OverlayProps = {
+                facility_id: data.facility_id,
+                pfct_nm: data.pfct_nm,
+                rating: data.rating,
+                review_count: data.review_count,
+                addr: data.addr,
+                zip: data.zip,
+            }
+            const overlayContent = overlayComponentToString(overlayProps);
             const overlay = new window.kakao.maps.CustomOverlay({
                 content: overlayContent,
-                position: marker.getPosition()
-            });
-
-            // 마커에 마우스오버 이벤트를 등록합니다
-            window.kakao.maps.event.addListener(marker, 'mouseover', () => {
-                overlay.setMap(mapRef.current);
-            });
-
-            // 마커에 마우스아웃 이벤트를 등록합니다
-            window.kakao.maps.event.addListener(marker, 'mouseout', () => {
-                if (!clickedMarkerAndOverlayRef.current || clickedMarkerAndOverlayRef.current[0] !== marker) {
-                    overlay.setMap(null);
-                }
+                position: marker.getPosition(),
+                clickable: true,
             });
 
             // 마커에 클릭 이벤트를 등록합니다
@@ -115,6 +140,8 @@ export const Home = () => {
 
                 overlay.setMap(mapRef.current);
                 clickedMarkerAndOverlayRef.current = [marker, overlay];
+
+                onNavigateFacility(marker.facilityId);      // 마커를 클릭하면 주소가 바뀐다
             });
 
             marker.setMap(mapRef.current); // 마커를 지도에 추가합니다
@@ -126,10 +153,14 @@ export const Home = () => {
         markersRef.current = newMarkers;
     }, [markerDatas]);
 
+    const onNavigateFacility = (facilityId: number) => {
+        navigate(`/p/place/${facilityId}`);
+    }
+
     return (
         <>
             <StyledMapContainer id="map" ></StyledMapContainer>
-            <SideBar />
+            <SideBar></SideBar>
         </>
     );
 }
