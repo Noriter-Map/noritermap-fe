@@ -23,6 +23,7 @@ export const Home = () => {
     const [markerDatas, setMarkerDatas] = useState<MarkerDataType[]>([]);
     const mapRef = useRef<any>(null);
     const markersRef = useRef<any[]>([]);
+    const clickedMarkerAndInfoWindowRef = useRef<[any, any] | null>(null);
 
     useEffect(() => {
         let mapContainer = document.getElementById('map');
@@ -40,6 +41,15 @@ export const Home = () => {
         // 지도 확대 축소를 제어할 수 있는 줌 컨트롤을 생성합니다
         let zoomControl = new window.kakao.maps.ZoomControl();
         mapInstance.addControl(zoomControl, window.kakao.maps.ControlPosition.RIGHT);
+
+        // 지도를 클릭하면 현재 활성화된 인포윈도우를 닫고, 상태를 초기화하는 이벤트 리스너 추가
+        window.kakao.maps.event.addListener(mapInstance, 'click', () => {
+            if (clickedMarkerAndInfoWindowRef.current) {
+                const curInfoWindow = clickedMarkerAndInfoWindowRef.current[1];
+                curInfoWindow.close();
+                clickedMarkerAndInfoWindowRef.current = null;
+            }
+        });
 
         mapRef.current = mapInstance;
     }, []);
@@ -72,7 +82,6 @@ export const Home = () => {
 
             // 마커를 생성합니다
             const marker = new window.kakao.maps.Marker({
-                map: mapRef.current, // 마커를 표시할 지도
                 position: new window.kakao.maps.LatLng(parseFloat(data.lat), parseFloat(data.lot)), // 마커를 표시할 위치
                 title: data.pfct_nm, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
                 image: markerImage // 마커 이미지
@@ -80,7 +89,7 @@ export const Home = () => {
 
             // 인포윈도우를 생성합니다
             const infowindow = new window.kakao.maps.InfoWindow({
-                content: `<div style="padding:5px;">${data.pfct_nm}</div>` // 인포윈도우에 표출될 내용
+                content: `<div style="padding:5px;">${data.pfct_nm}</div>`, // 인포윈도우에 표출될 내용
             });
 
             // 마커에 마우스오버 이벤트를 등록합니다
@@ -90,8 +99,25 @@ export const Home = () => {
 
             // 마커에 마우스아웃 이벤트를 등록합니다
             window.kakao.maps.event.addListener(marker, 'mouseout', () => {
-                infowindow.close();
+                if (!clickedMarkerAndInfoWindowRef.current || clickedMarkerAndInfoWindowRef.current[0] !== marker) {
+                    infowindow.close();
+                }
             });
+
+            // 마커에 클릭 이벤트를 등록합니다
+            window.kakao.maps.event.addListener(marker, 'click', () => {
+                if (clickedMarkerAndInfoWindowRef.current) {
+                    const curInfoWindow = clickedMarkerAndInfoWindowRef.current[1];
+                    if (curInfoWindow) {
+                        curInfoWindow.close();
+                    }
+                }
+
+                infowindow.open(mapRef.current, marker);
+                clickedMarkerAndInfoWindowRef.current = [marker, infowindow];
+            });
+
+            marker.setMap(mapRef.current); // 마커를 지도에 추가합니다
 
             return marker;
         });
@@ -102,8 +128,8 @@ export const Home = () => {
 
     return (
         <>
-            <StyledMapContainer id="map"></StyledMapContainer>
-            <SideBar></SideBar>
+            <StyledMapContainer id="map" ></StyledMapContainer>
+            <SideBar />
         </>
-    )
+    );
 }
