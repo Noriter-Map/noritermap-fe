@@ -78,6 +78,21 @@ export const Home = () => {
                 image: markerImage // 마커 이미지
             });
 
+            // 인포윈도우를 생성합니다
+            const infowindow = new window.kakao.maps.InfoWindow({
+                content: `<div style="padding:5px;">${data.pfct_nm}</div>` // 인포윈도우에 표출될 내용
+            });
+
+            // 마커에 마우스오버 이벤트를 등록합니다
+            window.kakao.maps.event.addListener(marker, 'mouseover', () => {
+                infowindow.open(mapRef.current, marker);
+            });
+
+            // 마커에 마우스아웃 이벤트를 등록합니다
+            window.kakao.maps.event.addListener(marker, 'mouseout', () => {
+                infowindow.close();
+            });
+
             return marker;
         });
 
