@@ -1,19 +1,29 @@
-import React, { useState } from 'react';
-import { StyledExpandButton, SidebarContainer } from './SideBar.style';
+import React, { useState } from "react";
+import {
+  StyledExpandButton,
+  SidebarContainer,
+  StyledTopDiv,
+} from "./SideBar.style";
+import { Search } from "../Search/Search";
 
 export const SideBar = () => {
-    const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-    const handleButtonClick = () => {
-        setIsOpen(!isOpen);
-    };
+  const handleButtonClick = () => {
+    setIsOpen(!isOpen);
+  };
 
-    return (
-        <>
-            <SidebarContainer isOpen={isOpen}>
-                {/* 메뉴 내용은 나중에 채울 것입니다 */}
-            </SidebarContainer>
-            <StyledExpandButton isOpen={isOpen} onClick={handleButtonClick}></StyledExpandButton>
-        </>
-    );
-}
+  return (
+    <>
+      <SidebarContainer isOpen={isOpen}>
+        <StyledTopDiv>
+          <Search />
+        </StyledTopDiv>
+      </SidebarContainer>
+      <StyledExpandButton
+        isOpen={isOpen}
+        onClick={handleButtonClick}
+      ></StyledExpandButton>
+    </>
+  );
+};
