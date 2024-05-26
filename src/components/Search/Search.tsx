@@ -1,5 +1,12 @@
 // Search.tsx
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  MutableRefObject,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import SearchIcon from "../../assets/SearchIcon.svg";
 import {
   ButtonLeft,
@@ -23,14 +30,24 @@ import SearchOptionItem from "../../components/SearchOptionItem/SearchOptionItem
 import { OptionState, OptionsState } from "../../recoil/OptionState";
 import { useRecoilState } from "recoil";
 import useIsOverflow from "../../hooks/useIsOverflow";
+import { transformOptionsToQueryParams } from "../../hooks/useTransformQuery";
+import { getFaciltySearch } from "../../apis/getFaciltySearch";
 
-export const Search = () => {
+interface SearchProps {
+  setSideBarData: Dispatch<SetStateAction<any>>;
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
+}
+
+export const Search = ({ setSideBarData, setIsLoading }: SearchProps) => {
   const searchInput = useRef<HTMLInputElement | null>(null);
   const searchWrap = useRef<HTMLDivElement | null>(null);
   const [searchFocus, setSearchFocus] = useState(false);
   const [optionsState, setOptionsState] = useRecoilState(OptionState);
   const chipContainerRef = useRef<HTMLDivElement | null>(null);
   const [scrollState, setScrollState] = useState("right");
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [isCurrentLat, setIsCurrentLat] = useState<number | null>(null);
+  const [isCurrentLng, setIsCurrentLng] = useState<number | null>(null);
 
   const clickWrap = (event: MouseEvent) => {
     if (
@@ -111,16 +128,60 @@ export const Search = () => {
     }));
   };
 
+  navigator.geolocation.getCurrentPosition((pos) => {
+    const currentLat = pos.coords.latitude;
+    const currentLng = pos.coords.longitude;
+    setIsCurrentLat(currentLat);
+    setIsCurrentLng(currentLng);
+  });
+
+  const handleSearch = async () => {
+    setSearchFocus(false);
+    setIsLoading(true);
+    const keyword = searchInput.current?.value || "";
+    const curLatitude = isCurrentLat;
+    const curLongitude = isCurrentLng;
+    const page = 0;
+    const size = 10;
+
+    const queryParams = transformOptionsToQueryParams(
+      optionsState,
+      keyword,
+      curLatitude?.toString() || "",
+      curLongitude?.toString() || "",
+      page,
+      size
+    );
+
+    try {
+      const response = await getFaciltySearch(queryParams);
+      setSideBarData(response);
+      console.log(response);
+    } catch (error) {
+      console.error("Search Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
     <StyledContainer>
       <StyledSearchBarWrapper ref={searchWrap}>
-        <StyledSearchIcon src={SearchIcon} />
+        <StyledSearchIcon src={SearchIcon} onClick={handleSearch} />
         <StyledSearchBar
           ref={searchInput}
           placeholder="놀이시설 검색"
           onFocus={() => {
             setSearchFocus(true);
           }}
+          onChange={(e) => setSearchKeyword(e.target.value)}
+          onKeyPress={handleKeyPress}
         />
       </StyledSearchBarWrapper>
       {searchFocus && (
