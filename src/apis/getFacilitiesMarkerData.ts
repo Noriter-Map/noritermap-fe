@@ -1,6 +1,6 @@
-import { client } from './client';
+import { local } from "./client";
 
 export const getFacilitiesMarkerData = async () => {
-    const response = await client.get(`data/facilitiesMarkerData.json`);
-    return response.data;
+  const response = await local.get(`data/marker_data.json`);
+  return response.data;
 };
