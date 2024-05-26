@@ -1,5 +1,5 @@
 import { atom } from "recoil";
-import { persistAtom } from "./persistAtom";
+// import { persistAtom } from "./persistAtom";
 
 import { SearchOptions } from "../constants/SearchOptions";
 
@@ -23,5 +23,4 @@ const initialOptionsState: OptionsState = SearchOptions.reduce(
 export const OptionState = atom({
   key: "OptionState",
   default: initialOptionsState,
-  effects_UNSTABLE: [persistAtom],
 });
