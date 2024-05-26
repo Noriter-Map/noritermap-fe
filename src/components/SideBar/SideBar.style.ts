@@ -43,10 +43,155 @@ export const SidebarContainer = styled.div<{ isOpen: boolean }>`
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   transition: left 0.3s ease;
   z-index: 9;
+  overflow-y: scroll;
 `;
 
 export const StyledTopDiv = styled.div`
   background-color: #ffdd00;
   width: 100%;
   height: 204px;
+`;
+
+export const StyledLoadingContainer = styled.div`
+  text-align: center;
+  margin-top: 300px;
+  margin-left: 150px;
+`;
+
+export const StyledNoResultContainer = styled.div`
+  margin-top: 300px;
+  text-align: center;
+`;
+
+export const StyledNoResultImg = styled.img`
+  width: 100px;
+  height: 100px;
+  margin-right: 18px;
+`;
+
+export const StyledNoResult = styled.div`
+  font-size: 24px;
+  color: #9d9d9d;
+  font-weight: 500;
+`;
+
+export const StyledSearchResultContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
+export const StyledSearchResult = styled.div`
+  margin-top: 24px;
+  margin-left: 24px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+export const StyledSearchResultWrapper = styled.div`
+  width: 100%;
+  height: fit-content;
+  box-shadow: 0px 1px 0px rgb(0, 0, 0, 0.25);
+`;
+
+export const StyledFacilityTitle = styled.div`
+  color: #0951b6;
+  font-size: 22px;
+  font-weight: 500;
+`;
+
+export const StyledDistLotAddrContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+`;
+
+export const StyledFacilityDist = styled.div`
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1c;
+`;
+
+export const StyledLotNumAddr = styled.div`
+  font-size: 18px;
+  color: #000000;
+  font-weight: 500;
+`;
+
+export const StyledRoNmAddr = styled.div`
+  width: fit-content;
+  font-size: 16px;
+  color: #000000;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+export const StyledRoNmContainer = styled.div`
+  width: 425px;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
+`;
+
+export const StyledLoacationIcon = styled.img`
+  width: 27px;
+  height: 27px;
+`;
+
+export const StyledClipBoardIcon = styled.img`
+  width: 14px;
+  height: 14px;
+  margin-left: 3px;
+`;
+
+export const StyledStarReviewContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  align-items: center;
+`;
+export const StyledStarIcon = styled.img`
+  width: 22px;
+  height: 22px;
+`;
+
+export const StyledRating = styled.div`
+  font-size: 18px;
+  font-weight: 500;
+  color: #f65751;
+`;
+
+export const StyledReviewCntText = styled.div`
+  margin-left: 2px;
+  padding-top: 4px;
+  font-size: 14px;
+  color: #3b3b3b;
+  font-weight: 400;
+`;
+
+export const StyledKeywordContainer = styled.div`
+  margin-top: 4px;
+  width: fit-content;
+  display: flex;
+  flex-direction: row;
+  gap: 14px;
+`;
+
+export const StyledKeyword = styled.div`
+  width: fit-content;
+  padding-left: 16px;
+  padding-top: 7px;
+  padding-right: 16px;
+  padding-bottom: 7px;
+  border-radius: 25px;
+  border: 1px solid #9d9d9d;
+  background-color: #ffffff;
+  font-size: 16px;
 `;
