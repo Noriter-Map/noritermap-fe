@@ -1,4 +1,4 @@
-import { StyledMapContainer } from "./Home.style";
+import { StyledGoCurrentImg, StyledMapContainer } from "./Home.style";
 import { useEffect, useState, useRef } from "react";
 import { SideBar } from "../../components/SideBar/SideBar";
 import { getFacilitiesMarkerData } from "../../apis/getFacilitiesMarkerData";
@@ -6,32 +6,15 @@ import MapPin from "../../assets/Map_pin.svg";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Overlay } from "../../components/Overlay/Overlay";
 import { useNavigate, useParams } from "react-router-dom";
+import { MarkerDataType, OverlayProps } from "../../types/Map.type";
+import GoCurrent from "../../assets/GoCurrent.svg";
+import CurrentIcon from "../../assets/CurrentMarker.svg";
+import { getReviewData } from "../../apis/getReviewData";
 
 declare global {
   interface Window {
     kakao: any;
   }
-}
-
-interface MarkerDataType {
-  facility_id: string;
-  lat: string;
-  lot: string;
-  pfct_nm: string;
-  addr: string;
-  instl_place_cd_nm: string;
-  rating: number;
-  review_count: number;
-  zip: string;
-}
-
-interface OverlayProps {
-  facility_id: string;
-  pfct_nm: string;
-  rating: number;
-  review_count: number;
-  addr: string;
-  zip: string;
 }
 
 const overlayComponentToString = (props: OverlayProps) => {
@@ -40,7 +23,7 @@ const overlayComponentToString = (props: OverlayProps) => {
       facility_id={props.facility_id}
       pfct_nm={props.pfct_nm}
       rating={props.rating}
-      review_count={props.review_count}
+      reviewCnt={props.reviewCnt}
       addr={props.addr}
       zip={props.zip}
     />
@@ -48,17 +31,22 @@ const overlayComponentToString = (props: OverlayProps) => {
 };
 
 export const Home = () => {
-  const { paramFacilityId } = useParams(); // 없으면 null 이 아니라 undefined 이다.
+  const { paramFacilityId } = useParams(); // 없으면 null이 아니라 undefined이다.
   const [markerDatas, setMarkerDatas] = useState<MarkerDataType[]>([]);
   const mapRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
   const clickedMarkerAndOverlayRef = useRef<[any, any] | null>(null);
+  const [currentPosition, setCurrentPosition] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const currentMarkerRef = useRef<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     let mapContainer = document.getElementById("map");
     let mapOption = {
-      center: new window.kakao.maps.LatLng(37.494539, 126.959929), // 지도의 중심좌표
+      center: new window.kakao.maps.LatLng(35.160048, 126.851309), // 지도의 중심좌표
       level: 3, // 지도의 확대 레벨
       mapTypeId: window.kakao.maps.MapTypeId.ROADMAP, // 지도종류
     };
@@ -105,9 +93,6 @@ export const Home = () => {
   useEffect(() => {
     if (markerDatas.length === 0 || !mapRef.current) return;
 
-    // // 마커가 이미 생성된 경우 추가 생성하지 않음
-    // if (markersRef.current.length > 0) return;
-
     // 새로운 마커들을 생성하고 지도에 추가
     const newMarkers = markerDatas.map((data) => {
       // 마커 이미지의 이미지 크기 입니다
@@ -125,34 +110,43 @@ export const Home = () => {
         title: data.pfct_nm, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
         image: markerImage, // 마커 이미지
       });
-      marker.facilityId = data.facility_id; // 마커 객체에 시설 ID 를 저장한다.
+      marker.facilityId = data.facility_id; // 마커 객체에 시설 ID를 저장합니다.
 
       const overlayProps: OverlayProps = {
         facility_id: data.facility_id,
         pfct_nm: data.pfct_nm,
-        rating: data.rating,
-        review_count: data.review_count,
         addr: data.addr,
         zip: data.zip,
+        rating: 0, // 초기값
+        reviewCnt: 0, // 초기값
       };
-      const overlayContent = overlayComponentToString(overlayProps);
-      const overlay = new window.kakao.maps.CustomOverlay({
-        content: overlayContent,
-        position: marker.getPosition(),
-        clickable: true,
-      });
 
       // 마커에 클릭 이벤트를 등록합니다
-      window.kakao.maps.event.addListener(marker, "click", () => {
+      window.kakao.maps.event.addListener(marker, "click", async () => {
         if (clickedMarkerAndOverlayRef.current) {
           const curOverlay = clickedMarkerAndOverlayRef.current[1];
           curOverlay && curOverlay.setMap(null);
         }
 
+        try {
+          const reviewData = await getReviewData(marker.facilityId);
+          overlayProps.rating = reviewData.rating;
+          overlayProps.reviewCnt = reviewData.reviewCnt;
+        } catch (error) {
+          console.error("Error fetching review data:", error);
+        }
+
+        const overlayContent = overlayComponentToString(overlayProps);
+        const overlay = new window.kakao.maps.CustomOverlay({
+          content: overlayContent,
+          position: marker.getPosition(),
+          clickable: true,
+        });
+
         overlay.setMap(mapRef.current);
         clickedMarkerAndOverlayRef.current = [marker, overlay];
 
-        onNavigateFacility(marker.facilityId); // 마커를 클릭하면 주소가 바뀐다
+        onNavigateFacility(marker.facilityId); // 마커를 클릭하면 주소가 바뀝니다.
       });
 
       marker.setMap(mapRef.current); // 마커를 지도에 추가합니다
@@ -168,9 +162,40 @@ export const Home = () => {
     navigate(`/p/place/${facilityId}`);
   };
 
+  const handleCurrentLocation = () => {
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const currentLat = pos.coords.latitude;
+      const currentLng = pos.coords.longitude;
+      const currentPos = new window.kakao.maps.LatLng(currentLat, currentLng);
+      setCurrentPosition({ lat: currentLat, lng: currentLng });
+
+      mapRef.current.setLevel(2);
+
+      if (currentMarkerRef.current) {
+        currentMarkerRef.current.setPosition(currentPos);
+      } else {
+        const imageSize = new window.kakao.maps.Size(48, 70);
+        const markerImage = new window.kakao.maps.MarkerImage(
+          CurrentIcon,
+          imageSize
+        );
+        const marker = new window.kakao.maps.Marker({
+          position: currentPos,
+          image: markerImage,
+        });
+        marker.setMap(mapRef.current);
+        currentMarkerRef.current = marker;
+      }
+
+      mapRef.current.panTo(currentPos);
+    });
+  };
+
   return (
     <>
-      <StyledMapContainer id="map"></StyledMapContainer>
+      <StyledMapContainer id="map">
+        <StyledGoCurrentImg src={GoCurrent} onClick={handleCurrentLocation} />
+      </StyledMapContainer>
       <SideBar />
     </>
   );
