@@ -37,7 +37,7 @@ export const SideBar = () => {
   const [sideBarData, setSideBarData] = useState<
     SearchFacilityListResponses | undefined
   >(undefined);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const handleButtonClick = () => {
     setIsOpen(!isOpen);
