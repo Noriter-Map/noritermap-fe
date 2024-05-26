@@ -1,8 +1,8 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const CustomOverlayContainer = styled.div`
   position: relative;
-  top: -120px; 
+  top: -120px;
 `;
 
 export const CustomOverlay = styled.div`
@@ -18,12 +18,14 @@ export const CustomOverlay = styled.div`
 `;
 
 export const Title = styled.div`
+  display: block;
+  line-height: 1.5;
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 5px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const Rating = styled.div`
@@ -50,6 +52,9 @@ export const Address = styled.div`
   font-size: 14px;
   line-height: 1.5;
   margin-bottom: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const PhoneNumber = styled.div`
@@ -68,7 +73,6 @@ export const Details = styled.div`
     text-decoration: none;
   }
 `;
-
 
 export const HiddenId = styled.div`
   display: none;
