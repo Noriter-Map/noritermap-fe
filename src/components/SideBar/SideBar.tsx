@@ -66,7 +66,7 @@ export const SideBar = ({
   onMarkerClick,
   setIsSideBarData,
 }: SideBarProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [sideBarData, setSideBarData] = useState<
     SearchFacilityListResponses | undefined
   >(undefined);
