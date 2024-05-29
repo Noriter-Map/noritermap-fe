@@ -56,9 +56,10 @@ export const StyledTopDiv = styled.div`
 export const StyledLogo = styled.img`
   width: 200px;
   position: absolute;
-  margin-left: 18px;
-  margin-top: 14px;
+  margin-left: 35px;
+  margin-top: 18px;
   cursor: pointer;
+  scale: 1.15;
 `;
 
 export const StyledMyRegionText = styled.div`

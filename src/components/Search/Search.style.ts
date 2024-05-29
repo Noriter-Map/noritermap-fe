@@ -8,15 +8,15 @@ export const StyledContainer = styled.div`
 `;
 
 export const StyledSearchBarWrapper = styled.div`
-  margin-top: 70px;
+  margin-top: 75px;
   position: relative;
-  width: 406px;
+  width: 430px;
   height: 65px;
 `;
 
 export const StyledSearchBar = styled.input`
   padding-right: 54px;
-  width: 324px;
+  width: 350px;
   height: 65px;
   background-color: #ffffff;
   border-radius: 12px;
@@ -24,7 +24,7 @@ export const StyledSearchBar = styled.input`
   font-size: 20px;
   color: #000000;
   line-height: 44px;
-  padding-left: 28px;
+  padding-left: 24px;
 
   &::placeholder {
     color: rgb(156, 156, 156);
@@ -42,7 +42,7 @@ export const StyledSearchIcon = styled.img`
   position: absolute;
   right: 6px;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-43%);
   width: 42px;
   height: auto;
   &:hover {
