@@ -17,5 +17,6 @@ export const local = axios.create({
     "Content-Type": "application/json",
     "ngrok-skip-browser-warning": true,
   },
-  baseURL: process.env.LOCAL_URL,
+  withCredentials: true,
+  baseURL: process.env.REACT_APP_LOCAL_URL,
 });
