@@ -181,7 +181,7 @@ export const DetailInfoTab = ({ id }: DetailLeftInfoProps) => {
       ) : (
         <StyledLoadingContainer>
           <BeatLoader
-            color={"#FFDD00"}
+            color={"#F3F08F"}
             loading={loading}
             size={20}
             aria-label="Loading Spinner"

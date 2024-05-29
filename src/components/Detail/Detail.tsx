@@ -142,7 +142,7 @@ export const Detail = ({ id, setSelectedFacility }: DetailProps) => {
       ) : (
         <StyledLoadingContainer>
           <PacmanLoader
-            color={"#FFDD00"}
+            color={"#F3F08F"}
             loading={loading}
             size={40}
             aria-label="Loading Spinner"

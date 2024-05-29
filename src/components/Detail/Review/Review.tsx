@@ -184,7 +184,7 @@ export const Review = ({ id, setIsUpdate }: DetailRightInfoProps) => {
       ) : (
         <StyledLoadingContainer>
           <BeatLoader
-            color={"#FFDD00"}
+            color={"#F3F08F"}
             loading={loading}
             size={20}
             aria-label="Loading Spinner"
