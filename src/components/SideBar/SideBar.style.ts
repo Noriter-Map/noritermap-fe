@@ -47,9 +47,26 @@ export const SidebarContainer = styled.div<{ isOpen: boolean }>`
 `;
 
 export const StyledTopDiv = styled.div`
-  background-color: #ffdd00;
+  background: #f3f08d;
   width: 100%;
-  height: 204px;
+  height: fit-content;
+  padding-bottom: 22px;
+`;
+
+export const StyledLogo = styled.img`
+  width: 200px;
+  position: absolute;
+  margin-left: 18px;
+  margin-top: 14px;
+  cursor: pointer;
+`;
+
+export const StyledMyRegionText = styled.div`
+  font-size: 24px;
+  font-weight: 600;
+  color: #000000;
+  margin-top: 24px;
+  margin-left: 24px;
 `;
 
 export const StyledLoadingContainer = styled.div`
@@ -102,6 +119,7 @@ export const StyledFacilityTitle = styled.div`
   color: #0951b6;
   font-size: 22px;
   font-weight: 500;
+  cursor: pointer;
 `;
 
 export const StyledDistLotAddrContainer = styled.div`
@@ -149,6 +167,7 @@ export const StyledClipBoardIcon = styled.img`
   width: 14px;
   height: 14px;
   margin-left: 3px;
+  cursor: pointer;
 `;
 
 export const StyledStarReviewContainer = styled.div`
@@ -157,6 +176,14 @@ export const StyledStarReviewContainer = styled.div`
   gap: 6px;
   align-items: center;
 `;
+
+export const StyledNoRating = styled.div`
+  color: #f65751;
+  font-size: 14px;
+  font-weight: 400;
+  padding-top: 3px;
+`;
+
 export const StyledStarIcon = styled.img`
   width: 22px;
   height: 22px;
@@ -194,4 +221,33 @@ export const StyledKeyword = styled.div`
   border: 1px solid #9d9d9d;
   background-color: #ffffff;
   font-size: 16px;
+`;
+
+export const StyledTextLine = styled.div`
+  margin: 0 auto;
+  width: 90%;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
+  padding-top: 20px;
+`;
+
+export const StyledTextBoldStyle = styled.span`
+  font-size: 15px;
+  font-weight: 600;
+  color: #000000;
+`;
+
+export const StyledTextMediumStyle = styled.span`
+  font-size: 13px;
+  font-weight: 400;
+  color: #000000;
+`;
+
+export const StyledLineStyle = styled.div`
+  flex-grow: 1;
+  height: 1px;
+  background-color: #d3d3d3;
+  margin-left: 4px;
 `;
