@@ -113,12 +113,16 @@ export const Home = () => {
       marker.facilityId = data.facility_id; // 마커 객체에 시설 ID를 저장
 
       window.kakao.maps.event.addListener(marker, "click", async () => {
+        console.log("클릭은 되니?");
         if (clickedMarkerAndOverlayRef.current) {
           const curOverlay = clickedMarkerAndOverlayRef.current[1];
           curOverlay && curOverlay.setMap(null);
         }
 
+        console.log("try 전");
+
         try {
+          console.log("try안 getReviewData 전");
           const reviewData = await getReviewData(marker.facilityId);
           console.log("reviewData",  reviewData); // 1
           const overlayProps = {
