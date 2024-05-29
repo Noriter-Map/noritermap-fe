@@ -55,6 +55,7 @@ import { Detail } from "../Detail/Detail";
 import { SideBarState } from "../../recoil/SideBarState";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {FetchingCurLocation} from "../FetchingCurLocation/FetchingCurLocation";
 
 interface SideBarProps {
   keyword?: string;
@@ -318,7 +319,7 @@ export const SideBar = ({
                 </StyledSearchResultWrapper>
               ))
             ) : (
-              <div>위치 불러오는 중... 잠시만 기다려주세요</div>
+                <FetchingCurLocation></FetchingCurLocation>
             )}
           </StyledSearchResultContainer>
         )}
