@@ -6,6 +6,5 @@ export const getReviewData = async (id: string) => {
     `/gj/v1/facility/overlay/rating-and-review/${id}`
   );
 
-  console.log("getReviewData 에러", response);
   return response.data.data;
 };

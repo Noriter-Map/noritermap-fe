@@ -62,12 +62,25 @@ export const StyledLogo = styled.img`
   scale: 1.15;
 `;
 
-export const StyledMyRegionText = styled.div`
-  font-size: 24px;
-  font-weight: 600;
-  color: #000000;
+export const StyledMyReginContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 14px;
   margin-top: 24px;
   margin-left: 24px;
+  align-items: center;
+`;
+
+export const StyledMyRegionIcon = styled.img`
+  width: 26px;
+  height: 26px;
+`;
+
+export const StyledMyRegionText = styled.div`
+  font-size: 20px;
+  transform: translateY(6%);
+  font-weight: 600;
+  color: #000000;
 `;
 
 export const StyledLoadingContainer = styled.div`

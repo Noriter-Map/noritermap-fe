@@ -10,6 +10,8 @@ import { MarkerDataType, OverlayProps } from "../../types/Map.type";
 import GoCurrent from "../../assets/GoCurrent.svg";
 import CurrentIcon from "../../assets/CurrentMarker.svg";
 import { getReviewData } from "../../apis/getReviewData";
+import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 
 declare global {
   interface Window {
@@ -17,17 +19,9 @@ declare global {
   }
 }
 
-const overlayComponentToString = (props: OverlayProps) => {
-  return renderToStaticMarkup(
-      <Overlay
-          facility_id={props.facility_id}
-          pfct_nm={props.pfct_nm}
-          rating={props.rating}
-          reviewCnt={props.reviewCnt}
-          addr={props.addr}
-          zip={props.zip}
-      />
-  );
+const renderOverlay = (overlayProps: OverlayProps, container: HTMLElement) => {
+  const root = createRoot(container);
+  root.render(<Overlay {...overlayProps} />);
 };
 
 export const Home = () => {
@@ -48,6 +42,9 @@ export const Home = () => {
   const MarkerRef = useRef<any>(null);
   const navigate = useNavigate();
   const [isSideBarData, setIsSideBarData] = useState<any>(null);
+  const [selectedFacilityId, setSelectedFacilityId] = useState<
+    string | undefined
+  >(facilityId);
 
   useEffect(() => {
     let mapContainer = document.getElementById("map");
@@ -60,14 +57,14 @@ export const Home = () => {
 
     let mapTypeControl = new window.kakao.maps.MapTypeControl();
     mapInstance.addControl(
-        mapTypeControl,
-        window.kakao.maps.ControlPosition.TOPRIGHT
+      mapTypeControl,
+      window.kakao.maps.ControlPosition.TOPRIGHT
     );
 
     let zoomControl = new window.kakao.maps.ZoomControl();
     mapInstance.addControl(
-        zoomControl,
-        window.kakao.maps.ControlPosition.RIGHT
+      zoomControl,
+      window.kakao.maps.ControlPosition.RIGHT
     );
 
     window.kakao.maps.event.addListener(mapInstance, "click", () => {
@@ -101,21 +98,20 @@ export const Home = () => {
   const spriteImageSize = new window.kakao.maps.Size(138, 68);
 
   const normalImage = new window.kakao.maps.MarkerImage(MapPin, normalSize, {
-    offset: normalOffset,   // 마커 이미지에서의 기준좌표
-    spriteOrigin: new window.kakao.maps.Point(0, 0),   // 스프라이트 이미지 중 사용할 영역의 좌상단 좌표
-    spriteSize: spriteImageSize     // 스프라이트 이미지의 크기
+    offset: normalOffset, // 마커 이미지에서의 기준좌표
+    spriteOrigin: new window.kakao.maps.Point(0, 0), // 스프라이트 이미지 중 사용할 영역의 좌상단 좌표
+    spriteSize: spriteImageSize, // 스프라이트 이미지의 크기
   });
   const overImage = new window.kakao.maps.MarkerImage(MapPin, overSize, {
     offset: overOffset,
     spriteOrigin: new window.kakao.maps.Point(86, 0),
-    spriteSize: spriteImageSize
-  })
+    spriteSize: spriteImageSize,
+  });
   const clickImage = new window.kakao.maps.MarkerImage(MapPin, normalSize, {
     offset: normalOffset,
     spriteOrigin: new window.kakao.maps.Point(43, 0),
-    spriteSize: spriteImageSize
-  })
-
+    spriteSize: spriteImageSize,
+  });
 
   useEffect(() => {
     if (markerDatas.length === 0 || !mapRef.current) return;
@@ -123,8 +119,8 @@ export const Home = () => {
     const newMarkers = markerDatas.map((data) => {
       const marker = new window.kakao.maps.Marker({
         position: new window.kakao.maps.LatLng(
-            parseFloat(data.lat),
-            parseFloat(data.lot)
+          parseFloat(data.lat),
+          parseFloat(data.lot)
         ),
         title: data.pfct_nm,
         image: normalImage,
@@ -133,25 +129,34 @@ export const Home = () => {
       marker.facilityId = data.facility_id; // 마커 객체에 시설 ID를 저장
 
       window.kakao.maps.event.addListener(marker, "mouseover", () => {
-        if (!clickedMarkerAndOverlayRef.current  || clickedMarkerAndOverlayRef.current[0] !== marker){
+        if (
+          !clickedMarkerAndOverlayRef.current ||
+          clickedMarkerAndOverlayRef.current[0] !== marker
+        ) {
           marker.setImage(overImage);
         }
       });
 
       window.kakao.maps.event.addListener(marker, "mouseout", () => {
-        if (!clickedMarkerAndOverlayRef.current  || clickedMarkerAndOverlayRef.current[0] !== marker){
+        if (
+          !clickedMarkerAndOverlayRef.current ||
+          clickedMarkerAndOverlayRef.current[0] !== marker
+        ) {
           marker.setImage(normalImage);
         }
-      })
+      });
 
       window.kakao.maps.event.addListener(marker, "click", async () => {
-        if (!clickedMarkerAndOverlayRef.current  || clickedMarkerAndOverlayRef.current[0] !== marker){
-          !!clickedMarkerAndOverlayRef.current && clickedMarkerAndOverlayRef.current[0].setImage(normalImage);
+        if (
+          !clickedMarkerAndOverlayRef.current ||
+          clickedMarkerAndOverlayRef.current[0] !== marker
+        ) {
+          !!clickedMarkerAndOverlayRef.current &&
+            clickedMarkerAndOverlayRef.current[0].setImage(normalImage);
 
           if (clickedMarkerAndOverlayRef.current) {
             clickedMarkerAndOverlayRef.current[0] = marker;
           }
-
 
           marker.setImage(clickImage);
         }
@@ -170,12 +175,14 @@ export const Home = () => {
             zip: data.zip ? data.zip : "",
             rating: reviewData.rating,
             reviewCnt: reviewData.reviewCnt,
+            onDetailClick: handleDetailClick,
           };
 
-          const overlayContent = overlayComponentToString(overlayProps);
+          const container = document.createElement("div");
+          renderOverlay(overlayProps, container);
 
           const overlay = new window.kakao.maps.CustomOverlay({
-            content: overlayContent,
+            content: container,
             position: marker.getPosition(),
             clickable: true,
           });
@@ -215,14 +222,14 @@ export const Home = () => {
 
       // 해당 마커 찾기 및 보이기
       const marker = markersRef.current.find(
-          (m) => m.facilityId === firstFacility.facilityId.toString()
+        (m) => m.facilityId === firstFacility.facilityId.toString()
       );
       if (marker) {
         marker.setMap(mapRef.current);
         window.kakao.maps.event.trigger(marker, "click");
       } else {
         console.error(
-            `Marker not found for facilityId: ${firstFacility.facilityId}`
+          `Marker not found for facilityId: ${firstFacility.facilityId}`
         );
       }
     }
@@ -246,8 +253,8 @@ export const Home = () => {
       } else {
         const imageSize = new window.kakao.maps.Size(48, 70);
         const markerImage = new window.kakao.maps.MarkerImage(
-            CurrentIcon,
-            imageSize
+          CurrentIcon,
+          imageSize
         );
         const marker = new window.kakao.maps.Marker({
           position: currentPos,
@@ -263,7 +270,7 @@ export const Home = () => {
 
   const handleMarkerClick = (facilityId: number) => {
     const markerData = markerDatas.find(
-        (marker) => marker.facility_id === facilityId.toString()
+      (marker) => marker.facility_id === facilityId.toString()
     );
 
     if (markerData) {
@@ -276,7 +283,7 @@ export const Home = () => {
 
       // 해당 마커를 찾고 클릭 이벤트 트리거
       const marker = markersRef.current.find(
-          (m) => m.facilityId === facilityId.toString()
+        (m) => m.facilityId === facilityId.toString()
       );
       if (marker) {
         // 클릭된 마커 보이기
@@ -290,17 +297,22 @@ export const Home = () => {
     }
   };
 
+  const handleDetailClick = (facilityId: string) => {
+    setSelectedFacilityId(facilityId);
+  };
+
   return (
-      <>
-        <StyledMapContainer id="map">
-          <StyledGoCurrentImg src={GoCurrent} onClick={handleCurrentLocation} />
-        </StyledMapContainer>
-        <SideBar
-            keyword={keyword}
-            facilityId={facilityId}
-            onMarkerClick={handleMarkerClick}
-            setIsSideBarData={setIsSideBarData}
-        />
-      </>
+    <>
+      <StyledMapContainer id="map">
+        <StyledGoCurrentImg src={GoCurrent} onClick={handleCurrentLocation} />
+      </StyledMapContainer>
+      <SideBar
+        keyword={keyword}
+        facilityId={facilityId}
+        onMarkerClick={handleMarkerClick}
+        setIsSideBarData={setIsSideBarData}
+        selectedFacilityId={selectedFacilityId}
+      />
+    </>
   );
 };

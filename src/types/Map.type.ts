@@ -15,6 +15,7 @@ export interface OverlayProps {
   zip: string;
   rating: number;
   reviewCnt: number;
+  onDetailClick: (facilityId: string) => void;
 }
 
 export interface LatLng {

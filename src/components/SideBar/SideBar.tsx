@@ -30,6 +30,8 @@ import {
   StyledLineStyle,
   StyledLogo,
   StyledNoRating,
+  StyledMyReginContainer,
+  StyledMyRegionIcon,
 } from "./SideBar.style";
 import { Search } from "../Search/Search";
 import {
@@ -41,6 +43,7 @@ import ClipBoard from "../../assets/ClipBoardIcon.svg";
 import StarIcon from "../../assets/StarIcon.svg";
 import NoResult from "../../assets/NoResult.svg";
 import Logo from "../../assets/Logo.svg";
+import MyRegionIcon from "../../assets/MyPositionIcon.svg";
 import { PacmanLoader } from "react-spinners";
 import { transformOptionsToQueryParams } from "../../hooks/useTransformQuery";
 import { getFaciltySearch } from "../../apis/getFaciltySearch";
@@ -58,6 +61,7 @@ interface SideBarProps {
   facilityId?: string;
   onMarkerClick: (facilityId: number) => void;
   setIsSideBarData: React.Dispatch<React.SetStateAction<any>>;
+  selectedFacilityId: string | undefined;
 }
 
 export const SideBar = ({
@@ -65,6 +69,7 @@ export const SideBar = ({
   facilityId,
   onMarkerClick,
   setIsSideBarData,
+  selectedFacilityId,
 }: SideBarProps) => {
   const [isOpen, setIsOpen] = useState(true);
   const [sideBarData, setSideBarData] = useState<
@@ -119,7 +124,7 @@ export const SideBar = ({
     );
 
     setLoading(true);
-    setError(null); // Reset error state
+    setError(null);
     try {
       const response = await getFaciltySearch(queryParams);
       const myposition = await getMyPosition(lat, lng);
@@ -238,14 +243,21 @@ export const SideBar = ({
           <StyledNoResultContainer>
             <StyledNoResult>{error}</StyledNoResult>
           </StyledNoResultContainer>
-        ) : sideBarData && sideBarData.data.content.length === 0 ? (
+        ) : // ) : selectedFacilityId  ? (
+        //   <Detail id={parseInt(selectedFacilityId)} />
+        sideBarData && sideBarData.data.content.length === 0 ? (
           <StyledNoResultContainer>
             <StyledNoResultImg src={NoResult} />
             <StyledNoResult>검색된 시설이 없습니다.</StyledNoResult>
           </StyledNoResultContainer>
         ) : (
           <StyledSearchResultContainer>
-            {isDefault && <StyledMyRegionText>{isMyRegion}</StyledMyRegionText>}
+            {isDefault && (
+              <StyledMyReginContainer>
+                {sideBarData && <StyledMyRegionIcon src={MyRegionIcon} />}
+                <StyledMyRegionText>{isMyRegion}</StyledMyRegionText>
+              </StyledMyReginContainer>
+            )}
             {sideBarData && (
               <StyledTextLine>
                 <StyledTextBoldStyle>내 주변</StyledTextBoldStyle>
@@ -291,7 +303,6 @@ export const SideBar = ({
                             navigator.clipboard.writeText(facility.ronaAddr);
                             toast("주소가 복사되었습니다. ✨");
                             toast.clearWaitingQueue();
-                            console.log("?");
                           }}
                         />
                       </StyledRoNmContainer>

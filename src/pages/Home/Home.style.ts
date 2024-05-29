@@ -12,7 +12,7 @@ export const StyledGoCurrentImg = styled.img`
   z-index: 9999;
   right: 0;
   top: 230px;
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   cursor: pointer;
 `;
