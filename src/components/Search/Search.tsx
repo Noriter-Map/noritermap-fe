@@ -25,20 +25,34 @@ import {
   UnderlinedChar,
 } from "./Search.style";
 import { SearchOptions } from "../../constants/SearchOptions";
-import { SearchOptionInfo } from "../../types/SearchOption.type";
+import {
+  SearchFacilityListResponses,
+  SearchOptionInfo,
+} from "../../types/SearchOption.type";
 import SearchOptionItem from "../../components/SearchOptionItem/SearchOptionItem";
 import { OptionState, OptionsState } from "../../recoil/OptionState";
 import { useRecoilState } from "recoil";
 import useIsOverflow from "../../hooks/useIsOverflow";
 import { transformOptionsToQueryParams } from "../../hooks/useTransformQuery";
 import { getFaciltySearch } from "../../apis/getFaciltySearch";
+import { useNavigate } from "react-router-dom";
+import { SideBarState } from "../../recoil/SideBarState";
 
 interface SearchProps {
   setSideBarData: Dispatch<SetStateAction<any>>;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
+  setIsDefault: Dispatch<SetStateAction<boolean>>;
+  setIsSideBarData: Dispatch<
+    SetStateAction<SearchFacilityListResponses | null>
+  >;
 }
 
-export const Search = ({ setSideBarData, setIsLoading }: SearchProps) => {
+export const Search = ({
+  setSideBarData,
+  setIsLoading,
+  setIsDefault,
+  setIsSideBarData,
+}: SearchProps) => {
   const searchInput = useRef<HTMLInputElement | null>(null);
   const searchWrap = useRef<HTMLDivElement | null>(null);
   const [searchFocus, setSearchFocus] = useState(false);
@@ -48,6 +62,8 @@ export const Search = ({ setSideBarData, setIsLoading }: SearchProps) => {
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [isCurrentLat, setIsCurrentLat] = useState<number | null>(null);
   const [isCurrentLng, setIsCurrentLng] = useState<number | null>(null);
+  const [sideBarState, setSideBarState] = useRecoilState(SideBarState);
+  const navigate = useNavigate();
 
   const clickWrap = (event: MouseEvent) => {
     if (
@@ -138,6 +154,8 @@ export const Search = ({ setSideBarData, setIsLoading }: SearchProps) => {
   const handleSearch = async () => {
     setSearchFocus(false);
     setIsLoading(true);
+    setSideBarState("search");
+
     const keyword = searchInput.current?.value || "";
     const curLatitude = isCurrentLat;
     const curLongitude = isCurrentLng;
@@ -153,10 +171,15 @@ export const Search = ({ setSideBarData, setIsLoading }: SearchProps) => {
       size
     );
 
+    if (keyword.trim() !== "") {
+      navigate(`/search/${keyword}`);
+    }
+
     try {
       const response = await getFaciltySearch(queryParams);
       setSideBarData(response);
-      console.log(response);
+      setIsDefault(false);
+      setIsSideBarData(response);
     } catch (error) {
       console.error("Search Error:", error);
     } finally {
