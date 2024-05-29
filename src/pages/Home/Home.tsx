@@ -146,7 +146,19 @@ export const Home = () => {
       });
 
       window.kakao.maps.event.addListener(marker, "click", async () => {
-        // 클릭된 마커가 없고, click 마커가 클릭된 마커가 아니면
+        // 클릭된 마커가 있고, 그것이 클릭한 마커와 같다면, 기본 이미지로 변경한다.
+        if (clickedMarkerAndOverlayRef.current && clickedMarkerAndOverlayRef.current[0] === marker) {
+          marker.setImage(normalImage);
+
+          // 만약 오버레이가 띄워져 있다면, 제거하고 그 아래 로직은 수행하지 않는다.
+          if (clickedMarkerAndOverlayRef.current[1]){
+            clickedMarkerAndOverlayRef.current[1].setMap(null);
+            clickedMarkerAndOverlayRef.current = null;
+            return;
+          }
+        }
+
+        // 클릭된 마커가 없거나, click 마커가 클릭된 마커가 아니면
         // 마커의 이미지를 클릭 이미지로 변경합니다
         if (!clickedMarkerAndOverlayRef.current || clickedMarkerAndOverlayRef.current[0] !== marker) {
           // 클릭된 마커 객체가 null이 아니면
