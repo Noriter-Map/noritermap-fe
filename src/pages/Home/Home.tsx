@@ -120,7 +120,7 @@ export const Home = () => {
 
         try {
           const reviewData = await getReviewData(marker.facilityId);
-
+          console.log("reviewData",  reviewData); // 1
           const overlayProps = {
             facility_id: data.facility_id,
             pfct_nm: data.pfct_nm,
@@ -129,15 +129,24 @@ export const Home = () => {
             rating: reviewData.rating,
             reviewCnt: reviewData.reviewCnt,
           };
+
+          console.log("overlayProps : ", overlayProps); // 2
           const overlayContent = overlayComponentToString(overlayProps);
+
+          console.log("overlayContent : ", overlayContent); // 3
           const overlay = new window.kakao.maps.CustomOverlay({
             content: overlayContent,
             position: marker.getPosition(),
             clickable: true,
           });
 
+          console.log("overlay : ", overlay); // 4
+
           overlay.setMap(mapRef.current);
+
+          console.log("overlay.setMap"); // 5
           clickedMarkerAndOverlayRef.current = [marker, overlay];
+          console.log("clickedMarkerAndOverlayRef.current") // 6
         } catch (error) {
           console.error("Error fetching review data:", error);
         }
