@@ -79,14 +79,12 @@ export const Home = () => {
     });
 
     mapRef.current = mapInstance;
-    console.log(process.env.REACT_APP_BASEURL);
   }, []);
 
   useEffect(() => {
     const fetchMarkerData = async () => {
       try {
         const data = await getFacilitiesMarkerData();
-        console.log(data);
         setMarkerDatas(data.data);
       } catch (error) {
         console.error("Error fetching marker data:", error);
@@ -114,18 +112,13 @@ export const Home = () => {
       marker.facilityId = data.facility_id; // 마커 객체에 시설 ID를 저장
 
       window.kakao.maps.event.addListener(marker, "click", async () => {
-        console.log("클릭은 되니?");
         if (clickedMarkerAndOverlayRef.current) {
           const curOverlay = clickedMarkerAndOverlayRef.current[1];
           curOverlay && curOverlay.setMap(null);
         }
 
-        console.log("try 전");
-
         try {
-          console.log("try안 getReviewData 전");
           const reviewData = await getReviewData(marker.facilityId);
-          console.log("reviewData", reviewData); // 1
           const overlayProps = {
             facility_id: data.facility_id,
             pfct_nm: data.pfct_nm,
@@ -135,23 +128,17 @@ export const Home = () => {
             reviewCnt: reviewData.reviewCnt,
           };
 
-          console.log("overlayProps : ", overlayProps); // 2
           const overlayContent = overlayComponentToString(overlayProps);
 
-          console.log("overlayContent : ", overlayContent); // 3
           const overlay = new window.kakao.maps.CustomOverlay({
             content: overlayContent,
             position: marker.getPosition(),
             clickable: true,
           });
 
-          console.log("overlay : ", overlay); // 4
-
           overlay.setMap(mapRef.current);
 
-          console.log("overlay.setMap"); // 5
           clickedMarkerAndOverlayRef.current = [marker, overlay];
-          console.log("clickedMarkerAndOverlayRef.current"); // 6
         } catch (error) {
           console.error("Error fetching review data:", error);
         }
@@ -174,14 +161,11 @@ export const Home = () => {
   }, [markerDatas]);
 
   useEffect(() => {
-    console.log("isSideBarData changed:", isSideBarData); // 디버깅용 로그 추가
-
     if (isSideBarData && isSideBarData.data.content.length > 0) {
       const firstFacility = isSideBarData.data.content[0];
       const lat = parseFloat(firstFacility.latCrtsVl);
       const lng = parseFloat(firstFacility.lotCrtsVl);
       const position = new window.kakao.maps.LatLng(lat, lng);
-      console.log("New map center position:", position);
       mapRef.current.panTo(position);
       mapRef.current.setLevel(3);
 
@@ -190,8 +174,6 @@ export const Home = () => {
         (m) => m.facilityId === firstFacility.facilityId.toString()
       );
       if (marker) {
-        console.log("Found marker for facilityId:", firstFacility.facilityId); // 디버깅용 로그 추가
-        // 클릭된 마커 보이기
         marker.setMap(mapRef.current);
         window.kakao.maps.event.trigger(marker, "click");
       } else {
