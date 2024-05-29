@@ -61,3 +61,63 @@ export interface SearchFacility {
   reviewCnt: number;
   distanceFromCur: number;
 }
+
+export interface FacilityInfoTop {
+  status: number;
+  data: {
+    facilityId: number;
+    pfctNm: string;
+    exfcYn: string;
+    instlPlaceCdNm: string;
+    rating: number;
+    reviewCnt: number;
+    ronaAddr: string;
+    latCrtsVl: string;
+    lotCrtsVl: string;
+  };
+}
+
+export interface FacilityInfoLeft {
+  status: number;
+  data: {
+    facilityId: number;
+    pfctSn: string;
+    pfctNm: string;
+    zip: string;
+    ronaAddr: string;
+    lotnoAddr: string;
+    instlYmd: string;
+    instlPlaceCdNm: string;
+    prvtPblcYnCdNm: string;
+    idrodrCdNm: string;
+    latCrtsVl: string;
+    lotCrtsVl: string;
+    incld_water: string;
+    cctvCnt: string;
+    insurance: string;
+    safetyInsp: string;
+    rides: [
+      {
+        pfctNm: string;
+        rideInstlYmd: string;
+        rideStylCdNm: string;
+      }
+    ];
+  };
+}
+
+export interface FacilityInfoRight {
+  status: number;
+  data: {
+    ratingAvg: number;
+    reviewCnt: number;
+    aiSummary: string;
+    reviews: [
+      {
+        nickname: string;
+        content: string;
+        rating: number;
+      }
+    ];
+  };
+}
