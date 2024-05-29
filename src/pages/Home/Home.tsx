@@ -79,6 +79,7 @@ export const Home = () => {
     });
 
     mapRef.current = mapInstance;
+    console.log(process.env.REACT_APP_BASEURL);
   }, []);
 
   useEffect(() => {
@@ -124,7 +125,7 @@ export const Home = () => {
         try {
           console.log("try안 getReviewData 전");
           const reviewData = await getReviewData(marker.facilityId);
-          console.log("reviewData",  reviewData); // 1
+          console.log("reviewData", reviewData); // 1
           const overlayProps = {
             facility_id: data.facility_id,
             pfct_nm: data.pfct_nm,
@@ -150,7 +151,7 @@ export const Home = () => {
 
           console.log("overlay.setMap"); // 5
           clickedMarkerAndOverlayRef.current = [marker, overlay];
-          console.log("clickedMarkerAndOverlayRef.current") // 6
+          console.log("clickedMarkerAndOverlayRef.current"); // 6
         } catch (error) {
           console.error("Error fetching review data:", error);
         }
