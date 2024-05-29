@@ -51,36 +51,38 @@ export const StyledTopDiv = styled.div`
   width: 100%;
   height: fit-content;
   padding-bottom: 22px;
+  border-bottom: 1px solid #e0e0e0;
 `;
 
 export const StyledLogo = styled.img`
   width: 200px;
   position: absolute;
-  margin-left: 35px;
+  margin-left: 60px;
   margin-top: 18px;
   cursor: pointer;
-  scale: 1.15;
+  scale: 1.4;
 `;
 
 export const StyledMyReginContainer = styled.div`
   display: flex;
   flex-direction: row;
   gap: 14px;
-  margin-top: 24px;
+  margin-top: 20px;
   margin-left: 24px;
   align-items: center;
 `;
 
 export const StyledMyRegionIcon = styled.img`
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
 `;
 
 export const StyledMyRegionText = styled.div`
-  font-size: 20px;
+  font-size: 18px;
   transform: translateY(6%);
   font-weight: 600;
   color: #000000;
+  margin-left: -3px;
 `;
 
 export const StyledLoadingContainer = styled.div`
@@ -113,9 +115,9 @@ export const StyledSearchResultContainer = styled.div`
 `;
 
 export const StyledSearchResult = styled.div`
-  margin-top: 24px;
+  margin-top: 18px;
   margin-left: 24px;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   overflow: hidden;
   height: fit-content;
   display: flex;
@@ -126,12 +128,22 @@ export const StyledSearchResult = styled.div`
 export const StyledSearchResultWrapper = styled.div`
   width: 100%;
   height: fit-content;
-  box-shadow: 0px 1px 0px rgb(0, 0, 0, 0.25);
+  position: relative;
+  
+   &:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent 3%, rgb(0, 0, 0, 0.25) 3%, rgb(0, 0, 0, 0.25) 97%, transparent 97%);
+  }
 `;
 
 export const StyledFacilityTitle = styled.div`
   color: #0951b6;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 500;
   cursor: pointer;
 `;
@@ -143,9 +155,10 @@ export const StyledDistLotAddrContainer = styled.div`
 `;
 
 export const StyledFacilityDist = styled.div`
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: #1a1a1c;
+  margin-left: 2px;
 `;
 
 export const StyledLotNumAddr = styled.div`
@@ -193,7 +206,7 @@ export const StyledStarReviewContainer = styled.div`
 
 export const StyledNoRating = styled.div`
   color: #f65751;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 400;
   padding-top: 3px;
 `;
@@ -212,13 +225,13 @@ export const StyledRating = styled.div`
 export const StyledReviewCntText = styled.div`
   margin-left: 2px;
   padding-top: 4px;
-  font-size: 14px;
+  font-size: 15px;
   color: #3b3b3b;
   font-weight: 400;
 `;
 
 export const StyledKeywordContainer = styled.div`
-  margin-top: 4px;
+  margin-top: 1px;
   width: fit-content;
   display: flex;
   flex-direction: row;
@@ -228,7 +241,7 @@ export const StyledKeywordContainer = styled.div`
 export const StyledKeyword = styled.div`
   width: fit-content;
   padding-left: 16px;
-  padding-top: 7px;
+  padding-top: 6px;
   padding-right: 16px;
   padding-bottom: 7px;
   border-radius: 25px;
@@ -244,7 +257,7 @@ export const StyledTextLine = styled.div`
   flex-direction: row;
   gap: 4px;
   align-items: center;
-  padding-top: 20px;
+  padding-top: 16px;
 `;
 
 export const StyledTextBoldStyle = styled.span`

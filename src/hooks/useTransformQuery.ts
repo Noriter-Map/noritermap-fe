@@ -12,11 +12,11 @@ export const transformOptionsToQueryParams = (
 ): SearchOptionRequest => {
   let idrodr = "";
 
-  if (optionsState["실내외"]) {
-    if (optionsState["실내외"]["실내"]) {
+  if (optionsState["실내외구분"]) {
+    if (optionsState["실내외구분"]["실내"]) {
       idrodr = "indoor";
     }
-    if (optionsState["실내외"]["실외"]) {
+    if (optionsState["실내외구분"]["실외"]) {
       if (idrodr) {
         idrodr += ",outdoor";
       } else {

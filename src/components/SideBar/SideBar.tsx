@@ -196,7 +196,7 @@ export const SideBar = ({
     if (isCurrentLat !== null && isCurrentLng !== null) {
       const initializeOptionsState = () => {
         setOptionsState({
-          실내외: {},
+          실내외구분: {},
           설치장소: {},
           민공구분: {},
         });
@@ -256,7 +256,7 @@ export const SideBar = ({
             {isDefault && (
               <StyledMyReginContainer>
                 {sideBarData && <StyledMyRegionIcon src={MyRegionIcon} />}
-                <StyledMyRegionText>{isMyRegion}</StyledMyRegionText>
+                <StyledMyRegionText>현재 내 위치 : {isMyRegion}</StyledMyRegionText>
               </StyledMyReginContainer>
             )}
             {sideBarData && (

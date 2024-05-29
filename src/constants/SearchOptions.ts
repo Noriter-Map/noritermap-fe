@@ -1,7 +1,7 @@
 import { SearchOptionInfo } from "../types/SearchOption.type";
 
 export const SearchOptions: SearchOptionInfo[] = [
-  { category: "실내외", option: ["실내", "실외"] },
+  { category: "실내외구분", option: ["실내", "실외"] },
   {
     category: "설치장소",
     option: [
