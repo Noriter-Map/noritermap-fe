@@ -120,11 +120,12 @@ export const Home = () => {
 
         try {
           const reviewData = await getReviewData(marker.facilityId);
+
           const overlayProps = {
             facility_id: data.facility_id,
             pfct_nm: data.pfct_nm,
             addr: data.addr,
-            zip: data.zip,
+            zip: data.zip ? data.zip : "",
             rating: reviewData.rating,
             reviewCnt: reviewData.reviewCnt,
           };
