@@ -129,35 +129,35 @@ export const Home = () => {
       marker.facilityId = data.facility_id; // 마커 객체에 시설 ID를 저장
 
       window.kakao.maps.event.addListener(marker, "mouseover", () => {
-        if (
-          !clickedMarkerAndOverlayRef.current ||
-          clickedMarkerAndOverlayRef.current[0] !== marker
-        ) {
+        // 클릭된 마커가 없고, mouseover된 마커가 클릭된 마커가 아니면
+        // 마커의 이미지를 오버 이미지로 변경합니다
+        if (!clickedMarkerAndOverlayRef.current || clickedMarkerAndOverlayRef.current[0] !== marker) {
           marker.setImage(overImage);
         }
       });
 
       window.kakao.maps.event.addListener(marker, "mouseout", () => {
-        if (
-          !clickedMarkerAndOverlayRef.current ||
-          clickedMarkerAndOverlayRef.current[0] !== marker
+        // 클릭된 마커가 없고, mouseout된 마커가 클릭된 마커가 아니면
+        // 마커의 이미지를 기본 이미지로 변경합니다
+        if (!clickedMarkerAndOverlayRef.current || clickedMarkerAndOverlayRef.current[0] !== marker
         ) {
           marker.setImage(normalImage);
         }
       });
 
       window.kakao.maps.event.addListener(marker, "click", async () => {
-        if (
-          !clickedMarkerAndOverlayRef.current ||
-          clickedMarkerAndOverlayRef.current[0] !== marker
-        ) {
-          !!clickedMarkerAndOverlayRef.current &&
-            clickedMarkerAndOverlayRef.current[0].setImage(normalImage);
+        // 클릭된 마커가 없고, click 마커가 클릭된 마커가 아니면
+        // 마커의 이미지를 클릭 이미지로 변경합니다
+        if (!clickedMarkerAndOverlayRef.current || clickedMarkerAndOverlayRef.current[0] !== marker) {
+          // 클릭된 마커 객체가 null이 아니면
+          // 클릭된 마커의 이미지를 기본 이미지로 변경하고
+          !!clickedMarkerAndOverlayRef.current && clickedMarkerAndOverlayRef.current[0].setImage(normalImage);
 
           if (clickedMarkerAndOverlayRef.current) {
             clickedMarkerAndOverlayRef.current[0] = marker;
           }
 
+          // 현재 클릭된 마커의 이미지는 클릭 이미지로 변경합니다
           marker.setImage(clickImage);
         }
 
