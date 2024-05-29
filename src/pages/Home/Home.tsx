@@ -2,7 +2,7 @@ import { StyledGoCurrentImg, StyledMapContainer } from "./Home.style";
 import { useEffect, useState, useRef } from "react";
 import { SideBar } from "../../components/SideBar/SideBar";
 import { getFacilitiesMarkerData } from "../../apis/getFacilitiesMarkerData";
-import MapPin from "../../assets/Map_pin.svg";
+import MapPin from "../../assets/marker.svg";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Overlay } from "../../components/Overlay/Overlay";
 import { useNavigate, useParams } from "react-router-dom";
@@ -31,7 +31,7 @@ const overlayComponentToString = (props: OverlayProps) => {
 };
 
 export const Home = () => {
-  const { paramFacilityId } = useParams(); // 없으면 null이 아니라 undefined이다.
+  const { keyword, facilityId } = useParams();
   const [markerDatas, setMarkerDatas] = useState<MarkerDataType[]>([]);
   const mapRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
@@ -41,32 +41,35 @@ export const Home = () => {
     lng: number;
   } | null>(null);
   const currentMarkerRef = useRef<any>(null);
+  const [FocusPosition, setFocusPosition] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const MarkerRef = useRef<any>(null);
   const navigate = useNavigate();
+  const [isSideBarData, setIsSideBarData] = useState<any>(null);
 
   useEffect(() => {
     let mapContainer = document.getElementById("map");
     let mapOption = {
-      center: new window.kakao.maps.LatLng(35.160048, 126.851309), // 지도의 중심좌표
-      level: 3, // 지도의 확대 레벨
-      mapTypeId: window.kakao.maps.MapTypeId.ROADMAP, // 지도종류
+      center: new window.kakao.maps.LatLng(35.160048, 126.851309),
+      level: 3,
+      mapTypeId: window.kakao.maps.MapTypeId.ROADMAP,
     };
-    let mapInstance = new window.kakao.maps.Map(mapContainer, mapOption); // 지도를 생성
+    let mapInstance = new window.kakao.maps.Map(mapContainer, mapOption);
 
-    // 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
     let mapTypeControl = new window.kakao.maps.MapTypeControl();
     mapInstance.addControl(
       mapTypeControl,
       window.kakao.maps.ControlPosition.TOPRIGHT
-    ); // 지도 타입 컨트롤을 지도에 표시합니다
+    );
 
-    // 지도 확대 축소를 제어할 수 있는 줌 컨트롤을 생성합니다
     let zoomControl = new window.kakao.maps.ZoomControl();
     mapInstance.addControl(
       zoomControl,
       window.kakao.maps.ControlPosition.RIGHT
     );
 
-    // 지도를 클릭하면 현재 활성화된 인포윈도우를 닫고, 상태를 초기화하는 이벤트 리스너 추가
     window.kakao.maps.event.addListener(mapInstance, "click", () => {
       if (clickedMarkerAndOverlayRef.current) {
         const curOverlay = clickedMarkerAndOverlayRef.current[1];
@@ -82,6 +85,7 @@ export const Home = () => {
     const fetchMarkerData = async () => {
       try {
         const data = await getFacilitiesMarkerData();
+        console.log(data);
         setMarkerDatas(data.data);
       } catch (error) {
         console.error("Error fetching marker data:", error);
@@ -93,35 +97,21 @@ export const Home = () => {
   useEffect(() => {
     if (markerDatas.length === 0 || !mapRef.current) return;
 
-    // 새로운 마커들을 생성하고 지도에 추가
     const newMarkers = markerDatas.map((data) => {
-      // 마커 이미지의 이미지 크기 입니다
-      const imageSize = new window.kakao.maps.Size(24, 35);
-
-      // 마커 이미지를 생성합니다
+      const imageSize = new window.kakao.maps.Size(34, 35);
       const markerImage = new window.kakao.maps.MarkerImage(MapPin, imageSize);
 
-      // 마커를 생성합니다
       const marker = new window.kakao.maps.Marker({
         position: new window.kakao.maps.LatLng(
           parseFloat(data.lat),
           parseFloat(data.lot)
-        ), // 마커를 표시할 위치
-        title: data.pfct_nm, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
-        image: markerImage, // 마커 이미지
+        ),
+        title: data.pfct_nm,
+        image: markerImage,
       });
-      marker.facilityId = data.facility_id; // 마커 객체에 시설 ID를 저장합니다.
 
-      const overlayProps: OverlayProps = {
-        facility_id: data.facility_id,
-        pfct_nm: data.pfct_nm,
-        addr: data.addr,
-        zip: data.zip,
-        rating: 0, // 초기값
-        reviewCnt: 0, // 초기값
-      };
+      marker.facilityId = data.facility_id; // 마커 객체에 시설 ID를 저장
 
-      // 마커에 클릭 이벤트를 등록합니다
       window.kakao.maps.event.addListener(marker, "click", async () => {
         if (clickedMarkerAndOverlayRef.current) {
           const curOverlay = clickedMarkerAndOverlayRef.current[1];
@@ -130,33 +120,72 @@ export const Home = () => {
 
         try {
           const reviewData = await getReviewData(marker.facilityId);
-          overlayProps.rating = reviewData.rating;
-          overlayProps.reviewCnt = reviewData.reviewCnt;
+          const overlayProps = {
+            facility_id: data.facility_id,
+            pfct_nm: data.pfct_nm,
+            addr: data.addr,
+            zip: data.zip,
+            rating: reviewData.rating,
+            reviewCnt: reviewData.reviewCnt,
+          };
+          const overlayContent = overlayComponentToString(overlayProps);
+          const overlay = new window.kakao.maps.CustomOverlay({
+            content: overlayContent,
+            position: marker.getPosition(),
+            clickable: true,
+          });
+
+          overlay.setMap(mapRef.current);
+          clickedMarkerAndOverlayRef.current = [marker, overlay];
         } catch (error) {
           console.error("Error fetching review data:", error);
         }
-
-        const overlayContent = overlayComponentToString(overlayProps);
-        const overlay = new window.kakao.maps.CustomOverlay({
-          content: overlayContent,
-          position: marker.getPosition(),
-          clickable: true,
-        });
-
-        overlay.setMap(mapRef.current);
-        clickedMarkerAndOverlayRef.current = [marker, overlay];
-
-        onNavigateFacility(marker.facilityId); // 마커를 클릭하면 주소가 바뀝니다.
       });
 
-      marker.setMap(mapRef.current); // 마커를 지도에 추가합니다
-
+      marker.setMap(mapRef.current);
       return marker;
     });
 
-    // 생성된 마커들을 상태로 저장
-    markersRef.current = newMarkers;
+    markersRef.current = newMarkers; // 마커를 ref에 저장
+
+    // 클러스터러 초기화 및 마커 추가
+    const clusterer = new window.kakao.maps.MarkerClusterer({
+      map: mapRef.current, // 마커들을 클러스터로 관리하고 표시할 지도 객체
+      averageCenter: true, // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정
+      minLevel: 5, // 클러스터 할 최소 지도 레벨
+    });
+
+    clusterer.addMarkers(newMarkers);
   }, [markerDatas]);
+
+  useEffect(() => {
+    console.log("isSideBarData changed:", isSideBarData); // 디버깅용 로그 추가
+
+    if (isSideBarData && isSideBarData.data.content.length > 0) {
+      const firstFacility = isSideBarData.data.content[0];
+      const lat = parseFloat(firstFacility.latCrtsVl);
+      const lng = parseFloat(firstFacility.lotCrtsVl);
+      const position = new window.kakao.maps.LatLng(lat, lng);
+      console.log("New map center position:", position);
+      mapRef.current.panTo(position);
+      mapRef.current.setLevel(3);
+
+      // 해당 마커 찾기 및 보이기
+      const marker = markersRef.current.find(
+        (m) => m.facilityId === firstFacility.facilityId.toString()
+      );
+      if (marker) {
+        console.log("Found marker for facilityId:", firstFacility.facilityId); // 디버깅용 로그 추가
+        // 클릭된 마커 보이기
+        marker.setMap(mapRef.current);
+        window.kakao.maps.event.trigger(marker, "click");
+      } else {
+        console.error(
+          `Marker not found for facilityId: ${firstFacility.facilityId}`
+        );
+      }
+    }
+  }, [isSideBarData]);
 
   const onNavigateFacility = (facilityId: number) => {
     navigate(`/p/place/${facilityId}`);
@@ -191,12 +220,46 @@ export const Home = () => {
     });
   };
 
+  const handleMarkerClick = (facilityId: number) => {
+    const markerData = markerDatas.find(
+      (marker) => marker.facility_id === facilityId.toString()
+    );
+
+    if (markerData) {
+      const lat = parseFloat(markerData.lat);
+      const lng = parseFloat(markerData.lot);
+      setFocusPosition({ lat, lng });
+      const position = new window.kakao.maps.LatLng(lat, lng);
+      mapRef.current.panTo(position);
+      mapRef.current.setLevel(2);
+
+      // 해당 마커를 찾고 클릭 이벤트 트리거
+      const marker = markersRef.current.find(
+        (m) => m.facilityId === facilityId.toString()
+      );
+      if (marker) {
+        // 클릭된 마커 보이기
+        marker.setMap(mapRef.current);
+        window.kakao.maps.event.trigger(marker, "click");
+      } else {
+        console.error(`Marker not found for facilityId: ${facilityId}`);
+      }
+    } else {
+      console.error(`Marker data not found for facilityId: ${facilityId}`);
+    }
+  };
+
   return (
     <>
       <StyledMapContainer id="map">
         <StyledGoCurrentImg src={GoCurrent} onClick={handleCurrentLocation} />
       </StyledMapContainer>
-      <SideBar />
+      <SideBar
+        keyword={keyword}
+        facilityId={facilityId}
+        onMarkerClick={handleMarkerClick}
+        setIsSideBarData={setIsSideBarData}
+      />
     </>
   );
 };
