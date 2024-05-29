@@ -54,6 +54,10 @@ export const Overlay = ({
     fetchReviewData();
   }, [facility_id]);
 
+  function formatToOneDecimalPlace(number: number) {
+    return number.toFixed(1);
+  }
+
   return (
     <CustomOverlayContainer>
       {OverlayData && (
@@ -61,7 +65,9 @@ export const Overlay = ({
           <HiddenId>{facility_id}</HiddenId>
           <Title>{pfct_nm}</Title>
           <Rating>
-            <RatingValue>{OverlayData.rating}</RatingValue>
+            <RatingValue>
+              {formatToOneDecimalPlace(OverlayData.rating)}
+            </RatingValue>
             <StyledStarContainer>
               {[...Array(5)].map((_, starIndex) => (
                 <Star key={starIndex} filled={starIndex < OverlayData.rating} />
