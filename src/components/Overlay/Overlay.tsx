@@ -47,7 +47,7 @@ export const Overlay = ({
           (우) {zip}
         </Address>
         <Details>
-          <a href="#">상세보기</a> · <a href="#">정보 수정 제안</a>
+          <div>상세보기</div> · <div>정보 수정 제안</div>
         </Details>
       </CustomOverlay>
     </CustomOverlayContainer>
