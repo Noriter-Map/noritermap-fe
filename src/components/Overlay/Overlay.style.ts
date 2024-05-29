@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const CustomOverlayContainer = styled.div`
   position: relative;
-  top: -120px;
+  top: -160px;
 `;
 
 export const CustomOverlay = styled.div`
