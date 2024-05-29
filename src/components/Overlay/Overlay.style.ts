@@ -18,7 +18,6 @@ export const CustomOverlay = styled.div`
   left: 50%;
   transform: translateX(-50%);
   pointer-events: auto;
-  cursor: pointer;
 `;
 
 export const Title = styled.div`
@@ -117,4 +116,5 @@ export const StyledGoDetail = styled.div`
   font-weight: 600;
   color: #213b76;
   pointer-events: auto;
+  cursor: pointer;
 `;
