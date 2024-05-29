@@ -12,7 +12,7 @@ export const CustomOverlay = styled.div`
   border: 1px solid #ccc;
   border-radius: 5px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  font-family: Arial, sans-serif;
+  font-family: "Pretendard Variable", Pretendard, Arial, sans-serif;
   position: relative;
   cursor: pointer;
 `;
