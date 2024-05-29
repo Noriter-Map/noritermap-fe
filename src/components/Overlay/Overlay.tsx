@@ -29,7 +29,7 @@ export const Overlay = ({
   addr,
   zip,
 }: OverlayProps) => {
-  const stars = "★★★★★".slice(0, Math.round(rating)); // 별점 개수 계산
+  const stars = "★★★★★".slice(0, Math.round(rating));
 
   return (
     <CustomOverlayContainer>
