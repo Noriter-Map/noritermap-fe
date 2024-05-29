@@ -91,6 +91,7 @@ export const Detail = ({ id, setSelectedFacility }: DetailProps) => {
           <KakaoRoadview
             lat={parseFloat(isFcTopData.data.latCrtsVl)}
             lng={parseFloat(isFcTopData.data.lotCrtsVl)}
+            pfctNm={isFcTopData.data.pfctNm}
           />
           <StyledTopWrapper>
             <StyledTopContainer>
