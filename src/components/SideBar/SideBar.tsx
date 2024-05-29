@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
   StyledExpandButton,
   SidebarContainer,
@@ -55,7 +55,7 @@ import { Detail } from "../Detail/Detail";
 import { SideBarState } from "../../recoil/SideBarState";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {FetchingCurLocation} from "../FetchingCurLocation/FetchingCurLocation";
+import { FetchingCurLocation } from "../FetchingCurLocation/FetchingCurLocation";
 
 interface SideBarProps {
   keyword?: string;
@@ -86,6 +86,9 @@ export const SideBar = ({
   const [sideBarState, setSideBarState] = useRecoilState(SideBarState);
   const [selectedFacility, setSelectedFacility] =
     useState<SearchFacility | null>(null);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver | null>(null);
   const navigate = useNavigate();
 
   const handleButtonClick = () => {
@@ -108,11 +111,14 @@ export const SideBar = ({
     }
   }
 
-  const fetchSideBarData = async (lat: number, lng: number) => {
+  const fetchSideBarData = async (
+    lat: number,
+    lng: number,
+    pageNumber: number
+  ) => {
     const keyword = "";
     const curLatitude = lat.toString();
     const curLongitude = lng.toString();
-    const page = 0;
     const size = 10;
 
     const queryParams = transformOptionsToQueryParams(
@@ -120,7 +126,7 @@ export const SideBar = ({
       keyword,
       curLatitude,
       curLongitude,
-      page,
+      pageNumber,
       size
     );
 
@@ -131,8 +137,22 @@ export const SideBar = ({
       const myposition = await getMyPosition(lat, lng);
       setIsMyRegion(myposition);
       console.log(response);
-      setSideBarData(response);
+
+      setSideBarData((prevData) => {
+        if (prevData && pageNumber > 0) {
+          return {
+            ...response,
+            data: {
+              ...response.data,
+              content: [...prevData.data.content, ...response.data.content],
+            },
+          };
+        } else {
+          return response;
+        }
+      });
       setIsSideBarData(response);
+      setHasMore(!response.data.last);
     } catch (error) {
       console.error("Search Error:", error);
       setError("데이터를 불러오는 데 실패했습니다. 다시 시도해 주세요.");
@@ -147,7 +167,7 @@ export const SideBar = ({
       const currentLng = pos.coords.longitude;
       setIsCurrentLat(currentLat);
       setIsCurrentLng(currentLng);
-      fetchSideBarData(currentLat, currentLng);
+      fetchSideBarData(currentLat, currentLng, 0);
     };
 
     const handleGeolocationError = (err: GeolocationPositionError) => {
@@ -156,7 +176,7 @@ export const SideBar = ({
       const defaultLng = 126.851309;
       setIsCurrentLat(defaultLat);
       setIsCurrentLng(defaultLng);
-      fetchSideBarData(defaultLat, defaultLng);
+      fetchSideBarData(defaultLat, defaultLng, 0);
     };
 
     if (isOpen) {
@@ -204,7 +224,7 @@ export const SideBar = ({
 
       initializeOptionsState();
 
-      fetchSideBarData(isCurrentLat, isCurrentLng);
+      fetchSideBarData(isCurrentLat, isCurrentLng, 0);
       setSideBarState("");
     }
   };
@@ -212,6 +232,26 @@ export const SideBar = ({
   function formatToOneDecimalPlace(number: number) {
     return number.toFixed(1);
   }
+
+  const lastFacilityElementRef = useCallback(
+    (node: HTMLElement | null) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prevPage) => prevPage + 1);
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
+
+  useEffect(() => {
+    if (isCurrentLat !== null && isCurrentLng !== null) {
+      fetchSideBarData(isCurrentLat, isCurrentLng, page);
+    }
+  }, [page]);
 
   return (
     <>
@@ -230,7 +270,7 @@ export const SideBar = ({
             id={selectedFacility.facilityId}
             setSelectedFacility={setSelectedFacility}
           />
-        ) : loading ? (
+        ) : loading && page === 0 ? (
           <StyledLoadingContainer>
             <PacmanLoader
               color={"#F3F08F"}
@@ -244,9 +284,7 @@ export const SideBar = ({
           <StyledNoResultContainer>
             <StyledNoResult>{error}</StyledNoResult>
           </StyledNoResultContainer>
-        ) : // ) : selectedFacilityId  ? (
-        //   <Detail id={parseInt(selectedFacilityId)} />
-        sideBarData && sideBarData.data.content.length === 0 ? (
+        ) : sideBarData && sideBarData.data.content.length === 0 ? (
           <StyledNoResultContainer>
             <StyledNoResultImg src={NoResult} />
             <StyledNoResult>검색된 시설이 없습니다.</StyledNoResult>
@@ -255,8 +293,14 @@ export const SideBar = ({
           <StyledSearchResultContainer>
             {isDefault && (
               <StyledMyReginContainer>
-                {sideBarData && <StyledMyRegionIcon src={MyRegionIcon} />}
-                <StyledMyRegionText>현재 내 위치 : {isMyRegion}</StyledMyRegionText>
+                {sideBarData && (
+                  <>
+                    <StyledMyRegionIcon src={MyRegionIcon} />{" "}
+                    <StyledMyRegionText>
+                      현재 내 위치 : {isMyRegion}
+                    </StyledMyRegionText>
+                  </>
+                )}
               </StyledMyReginContainer>
             )}
             {sideBarData && (
@@ -267,59 +311,130 @@ export const SideBar = ({
               </StyledTextLine>
             )}
             {sideBarData ? (
-              sideBarData.data.content.map((facility) => (
-                <StyledSearchResultWrapper key={facility.facilityId}>
-                  <StyledSearchResult>
-                    <StyledFacilityTitle
-                      onClick={() => handleFacilityClick(facility)}
+              sideBarData.data.content.map((facility, index) => {
+                if (sideBarData.data.content.length === index + 1) {
+                  return (
+                    <StyledSearchResultWrapper
+                      ref={lastFacilityElementRef}
+                      key={facility.facilityId}
                     >
-                      {facility.pfctNm}
-                    </StyledFacilityTitle>
-                    <StyledDistLotAddrContainer>
-                      <StyledFacilityDist>
-                        {formatDistance(facility.distanceFromCur)}
-                      </StyledFacilityDist>
-                      <StyledStarReviewContainer>
-                        <StyledStarIcon src={StarIcon} />
-                        {facility.rating === 0 ? (
-                          <StyledNoRating>정보 없음</StyledNoRating>
-                        ) : (
-                          <StyledRating>
-                            {formatToOneDecimalPlace(facility.rating)}
-                          </StyledRating>
+                      <StyledSearchResult>
+                        <StyledFacilityTitle
+                          onClick={() => handleFacilityClick(facility)}
+                        >
+                          {facility.pfctNm}
+                        </StyledFacilityTitle>
+                        <StyledDistLotAddrContainer>
+                          <StyledFacilityDist>
+                            {formatDistance(facility.distanceFromCur)}
+                          </StyledFacilityDist>
+                          <StyledStarReviewContainer>
+                            <StyledStarIcon src={StarIcon} />
+                            {facility.rating === 0 ? (
+                              <StyledNoRating>정보 없음</StyledNoRating>
+                            ) : (
+                              <StyledRating>
+                                {formatToOneDecimalPlace(facility.rating)}
+                              </StyledRating>
+                            )}
+                            <StyledReviewCntText>
+                              후기 ({facility.reviewCnt})
+                            </StyledReviewCntText>
+                          </StyledStarReviewContainer>
+                        </StyledDistLotAddrContainer>
+                        {facility.ronaAddr && (
+                          <StyledRoNmContainer>
+                            <StyledLoacationIcon src={RoNmIcon} />
+                            <StyledRoNmAddr>{facility.ronaAddr}</StyledRoNmAddr>
+                            <StyledClipBoardIcon
+                              src={ClipBoard}
+                              onClick={(event: React.MouseEvent) => {
+                                event.stopPropagation();
+                                navigator.clipboard.writeText(
+                                  facility.ronaAddr
+                                );
+                                toast("주소가 복사되었습니다. ✨");
+                                toast.clearWaitingQueue();
+                              }}
+                            />
+                          </StyledRoNmContainer>
                         )}
-                        <StyledReviewCntText>
-                          후기 ({facility.reviewCnt})
-                        </StyledReviewCntText>
-                      </StyledStarReviewContainer>
-                    </StyledDistLotAddrContainer>
-                    {facility.ronaAddr && (
-                      <StyledRoNmContainer>
-                        <StyledLoacationIcon src={RoNmIcon} />
-                        <StyledRoNmAddr>{facility.ronaAddr}</StyledRoNmAddr>
-                        <StyledClipBoardIcon
-                          src={ClipBoard}
-                          onClick={(event: React.MouseEvent) => {
-                            event.stopPropagation();
-                            navigator.clipboard.writeText(facility.ronaAddr);
-                            toast("주소가 복사되었습니다. ✨");
-                            toast.clearWaitingQueue();
-                          }}
-                        />
-                      </StyledRoNmContainer>
-                    )}
-                    <StyledKeywordContainer>
-                      {facility.idrodrCdNm !== "undefined" && (
-                        <StyledKeyword>{facility.idrodrCdNm}</StyledKeyword>
-                      )}
-                      <StyledKeyword>{facility.instlPlaceCdNm}</StyledKeyword>
-                      <StyledKeyword>{facility.prvtPblcYnCdNm}</StyledKeyword>
-                    </StyledKeywordContainer>
-                  </StyledSearchResult>
-                </StyledSearchResultWrapper>
-              ))
+                        <StyledKeywordContainer>
+                          {facility.idrodrCdNm !== "undefined" && (
+                            <StyledKeyword>{facility.idrodrCdNm}</StyledKeyword>
+                          )}
+                          <StyledKeyword>
+                            {facility.instlPlaceCdNm}
+                          </StyledKeyword>
+                          <StyledKeyword>
+                            {facility.prvtPblcYnCdNm}
+                          </StyledKeyword>
+                        </StyledKeywordContainer>
+                      </StyledSearchResult>
+                    </StyledSearchResultWrapper>
+                  );
+                } else {
+                  return (
+                    <StyledSearchResultWrapper key={facility.facilityId}>
+                      <StyledSearchResult>
+                        <StyledFacilityTitle
+                          onClick={() => handleFacilityClick(facility)}
+                        >
+                          {facility.pfctNm}
+                        </StyledFacilityTitle>
+                        <StyledDistLotAddrContainer>
+                          <StyledFacilityDist>
+                            {formatDistance(facility.distanceFromCur)}
+                          </StyledFacilityDist>
+                          <StyledStarReviewContainer>
+                            <StyledStarIcon src={StarIcon} />
+                            {facility.rating === 0 ? (
+                              <StyledNoRating>정보 없음</StyledNoRating>
+                            ) : (
+                              <StyledRating>
+                                {formatToOneDecimalPlace(facility.rating)}
+                              </StyledRating>
+                            )}
+                            <StyledReviewCntText>
+                              후기 ({facility.reviewCnt})
+                            </StyledReviewCntText>
+                          </StyledStarReviewContainer>
+                        </StyledDistLotAddrContainer>
+                        {facility.ronaAddr && (
+                          <StyledRoNmContainer>
+                            <StyledLoacationIcon src={RoNmIcon} />
+                            <StyledRoNmAddr>{facility.ronaAddr}</StyledRoNmAddr>
+                            <StyledClipBoardIcon
+                              src={ClipBoard}
+                              onClick={(event: React.MouseEvent) => {
+                                event.stopPropagation();
+                                navigator.clipboard.writeText(
+                                  facility.ronaAddr
+                                );
+                                toast("주소가 복사되었습니다. ✨");
+                                toast.clearWaitingQueue();
+                              }}
+                            />
+                          </StyledRoNmContainer>
+                        )}
+                        <StyledKeywordContainer>
+                          {facility.idrodrCdNm !== "undefined" && (
+                            <StyledKeyword>{facility.idrodrCdNm}</StyledKeyword>
+                          )}
+                          <StyledKeyword>
+                            {facility.instlPlaceCdNm}
+                          </StyledKeyword>
+                          <StyledKeyword>
+                            {facility.prvtPblcYnCdNm}
+                          </StyledKeyword>
+                        </StyledKeywordContainer>
+                      </StyledSearchResult>
+                    </StyledSearchResultWrapper>
+                  );
+                }
+              })
             ) : (
-                <FetchingCurLocation></FetchingCurLocation>
+              <FetchingCurLocation></FetchingCurLocation>
             )}
           </StyledSearchResultContainer>
         )}
