@@ -289,7 +289,7 @@ export const Home = () => {
     if (targetMarker) {
       const position = targetMarker.getPosition();
 
-      mapRef.current.panTo(position);
+      mapRef.current.setCenter(position);
       mapRef.current.setLevel(2);
     }
   };
