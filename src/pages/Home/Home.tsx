@@ -44,6 +44,7 @@ export const Home = () => {
   const navigate = useNavigate();
   const [isSideBarData, setIsSideBarData] = useState<any>(null);
   const [isMarkerFetchDone, setIsMarkerFetchDone] = useState(false);
+  const [isSearchMarkerFetchDone, setIsSearchMarkerFetchDone] = useState(false);
 
   useEffect(() => {
     let mapContainer = document.getElementById("map");
@@ -233,6 +234,7 @@ export const Home = () => {
 
     clusterer.addMarkers(newMarkers);
     setIsMarkerFetchDone(true);
+    setIsSearchMarkerFetchDone(true);
   }, [markerDatas]);
 
   useEffect(() => {
@@ -241,6 +243,8 @@ export const Home = () => {
       const lat = parseFloat(firstFacility.latCrtsVl);
       const lng = parseFloat(firstFacility.lotCrtsVl);
       const position = new window.kakao.maps.LatLng(lat, lng);
+      console.log(isSideBarData);
+      handleMarkerClick(firstFacility.facilityId);
       mapRef.current.panTo(position);
       mapRef.current.setLevel(3);
 
@@ -250,18 +254,13 @@ export const Home = () => {
       );
       if (marker) {
         marker.setMap(mapRef.current);
-        window.kakao.maps.event.trigger(marker, "click");
-      } else {
-        console.error(
-          `Marker not found for facilityId: ${firstFacility.facilityId}`
-        );
       }
     }
-  }, [isSideBarData]);
+  }, [isSideBarData, isSearchMarkerFetchDone]);
 
   // /p/place/:facilityId 경로로 접속하였을 경우
   useEffect(() => {
-    if (facilityId !== undefined && markersRef.current.length !== 0){
+    if (facilityId !== undefined && markersRef.current.length !== 0) {
       handleMarkerClick(parseInt(facilityId));
     }
   }, [facilityId, isMarkerFetchDone]);
@@ -300,6 +299,8 @@ export const Home = () => {
       (marker) => marker.facilityId === facilityId.toString()
     );
 
+    console.log(targetMarker);
+
     if (targetMarker) {
       const position = targetMarker.getPosition();
 
@@ -307,13 +308,19 @@ export const Home = () => {
       mapRef.current.setLevel(2);
 
       // 클릭된 마커가 없다면, targetMarker 를 클릭처리한다.
-      if (clickedMarkerAndOverlayRef.current === null){
+      if (clickedMarkerAndOverlayRef.current === null) {
         targetMarker.setImage(clickImage);
-        clickedMarkerAndOverlayRef.current = [targetMarker, null];
+        clickedMarkerAndOverlayRef.current = [
+          targetMarker,
+          new window.kakao.maps.CustomOverlay({}),
+        ];
       }
 
       // 클릭된 마커가 있고, 그것이 타겟 마커와 다르다면, 기본 이미지로 변경한다.
-      else if (clickedMarkerAndOverlayRef.current && clickedMarkerAndOverlayRef.current[0] !== targetMarker) {
+      else if (
+        clickedMarkerAndOverlayRef.current &&
+        clickedMarkerAndOverlayRef.current[0] !== targetMarker
+      ) {
         clickedMarkerAndOverlayRef.current[0].setImage(normalImage);
 
         // 만약 오버레이가 띄워져 있다면, 제거한다
