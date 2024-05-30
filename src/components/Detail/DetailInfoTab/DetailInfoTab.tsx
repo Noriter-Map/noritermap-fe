@@ -48,7 +48,6 @@ export const DetailInfoTab = ({ id }: DetailLeftInfoProps) => {
     const fetchData = async () => {
       try {
         const response = await getFcInfoLeft(id);
-        console.log(response);
         setIsDetailData(response);
       } catch (error) {
         console.error("Search Error:", error);

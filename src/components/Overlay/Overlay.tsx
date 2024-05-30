@@ -85,7 +85,7 @@ export const Overlay = ({
                 alert("열심히 준비 중이에요!");
               }}
             >
-              정보 수정 제안
+              {/*정보 수정 제안*/}
             </StyledGoDetail>
           </Details>
         </CustomOverlay>

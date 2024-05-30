@@ -7,20 +7,6 @@ export function Router() {
   const navigate = useNavigate();
   const [isReloaded, setIsReloaded] = useState(false);
 
-  useEffect(() => {
-    const navigationEntries = performance.getEntriesByType(
-      "navigation"
-    ) as PerformanceNavigationTiming[];
-    if (
-      !isReloaded &&
-      navigationEntries.length > 0 &&
-      navigationEntries[0].type === "reload"
-    ) {
-      setIsReloaded(true);
-      navigate("/");
-    }
-  }, [isReloaded, navigate]);
-
   return (
     <>
       <Routes>
