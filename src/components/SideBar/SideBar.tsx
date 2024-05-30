@@ -56,21 +56,20 @@ import { SideBarState } from "../../recoil/SideBarState";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FetchingCurLocation } from "../FetchingCurLocation/FetchingCurLocation";
+import {parseInt} from "lodash";
 
 interface SideBarProps {
   keyword?: string;
-  facilityId?: string;
+  pathFacilityId?: string;
   onMarkerClick: (facilityId: number) => void;
   setIsSideBarData: React.Dispatch<React.SetStateAction<any>>;
-  selectedFacilityId: string | undefined;
 }
 
 export const SideBar = ({
   keyword,
-  facilityId,
+  pathFacilityId,
   onMarkerClick,
   setIsSideBarData,
-  selectedFacilityId,
 }: SideBarProps) => {
   const [isOpen, setIsOpen] = useState(true);
   const [sideBarData, setSideBarData] = useState<
@@ -186,7 +185,7 @@ export const SideBar = ({
       setSideBarState("");
     };
 
-    if (isOpen) {
+    if (pathFacilityId === undefined && isOpen) {
       navigator.geolocation.getCurrentPosition(
         handleGeolocationSuccess,
         handleGeolocationError
@@ -237,7 +236,7 @@ export const SideBar = ({
   );
 
   useEffect(() => {
-    if (sideBarState === "search" && page > 0 && searchRef.current) {
+    if (sideBarState === "search" && page > 0 && searchRef.current && pathFacilityId === undefined) {
       searchRef.current.handleSearch(false);
     }
   }, [page, sideBarState]);
@@ -246,11 +245,32 @@ export const SideBar = ({
     if (
       sideBarState !== "search" &&
       isCurrentLat !== null &&
-      isCurrentLng !== null
+      isCurrentLng !== null &&
+        pathFacilityId === undefined
     ) {
       fetchSideBarData(isCurrentLat, isCurrentLng, page, keyword);
     }
   }, [page, sideBarState, isCurrentLat, isCurrentLng]);
+
+  useEffect(() => {
+    if (pathFacilityId !== undefined){
+      setSelectedFacility({
+        facilityId: parseInt(pathFacilityId),
+        pfctNm: '',
+        ronaAddr: '',
+        lotnoAddr: '',
+        instlPlaceCdNm: '',
+        prvtPblcYnCdNm: '',
+        idrodrCdNm: '',
+        latCrtsVl: '',
+        lotCrtsVl: '',
+        rating: 0.0,
+        reviewCnt: 0.0,
+        distanceFromCur: 0.0,
+      });
+      setSideBarState("detail");
+    }
+  }, [pathFacilityId]);
 
   return (
     <>

@@ -43,9 +43,7 @@ export const Home = () => {
   const MarkerRef = useRef<any>(null);
   const navigate = useNavigate();
   const [isSideBarData, setIsSideBarData] = useState<any>(null);
-  const [selectedFacilityId, setSelectedFacilityId] = useState<
-    string | undefined
-  >(facilityId);
+  const [isMarkerFetchDone, setIsMarkerFetchDone] = useState(false);
 
   useEffect(() => {
     let mapContainer = document.getElementById("map");
@@ -234,6 +232,7 @@ export const Home = () => {
     });
 
     clusterer.addMarkers(newMarkers);
+    setIsMarkerFetchDone(true);
   }, [markerDatas]);
 
   useEffect(() => {
@@ -260,17 +259,19 @@ export const Home = () => {
     }
   }, [isSideBarData]);
 
-  const onNavigateFacility = (facilityId: number) => {
-    navigate(`/p/place/${facilityId}`);
-  };
+  useEffect(() => {
+    if (facilityId !== undefined && markersRef.current.length !== 0){
+      handleMarkerClick(parseInt(facilityId));
+    }
+  }, [facilityId, isMarkerFetchDone]);
 
   const handleCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition((pos) => {
       const currentLat = pos.coords.latitude;
       const currentLng = pos.coords.longitude;
       const currentPos = new window.kakao.maps.LatLng(currentLat, currentLng);
-      setCurrentPosition({ lat: currentLat, lng: currentLng });
 
+      setCurrentPosition({ lat: currentLat, lng: currentLng });
       mapRef.current.setLevel(2);
 
       if (currentMarkerRef.current) {
@@ -304,11 +305,14 @@ export const Home = () => {
       mapRef.current.setCenter(position);
       mapRef.current.setLevel(2);
 
+      // 클릭된 마커가 없다면, targetMarker 를 클릭처리한다.
+      if (clickedMarkerAndOverlayRef.current === null){
+        targetMarker.setImage(clickImage);
+        clickedMarkerAndOverlayRef.current = [targetMarker, null];
+      }
+
       // 클릭된 마커가 있고, 그것이 타겟 마커와 다르다면, 기본 이미지로 변경한다.
-      if (
-        clickedMarkerAndOverlayRef.current &&
-        clickedMarkerAndOverlayRef.current[0] !== targetMarker
-      ) {
+      else if (clickedMarkerAndOverlayRef.current && clickedMarkerAndOverlayRef.current[0] !== targetMarker) {
         clickedMarkerAndOverlayRef.current[0].setImage(normalImage);
 
         // 만약 오버레이가 띄워져 있다면, 제거한다
@@ -321,8 +325,9 @@ export const Home = () => {
     }
   };
 
+  // 오버레이에서 상세 정보 보기를 눌렀을 때 호출
   const handleDetailClick = (facilityId: string) => {
-    setSelectedFacilityId(facilityId);
+    navigate(`/p/place/${facilityId}`);
   };
 
   return (
@@ -332,10 +337,9 @@ export const Home = () => {
       </StyledMapContainer>
       <SideBar
         keyword={keyword}
-        facilityId={facilityId}
+        pathFacilityId={facilityId}
         onMarkerClick={handleMarkerClick}
         setIsSideBarData={setIsSideBarData}
-        selectedFacilityId={selectedFacilityId}
       />
     </>
   );
