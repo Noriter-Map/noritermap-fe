@@ -60,14 +60,14 @@ export const StyledDesc = styled.div`
 `;
 
 export const StyledBack = styled.img`
-  z-index: 9999;
+  z-index: 1;
   width: 36px;
   height: 32px;
   cursor: pointer;
   position: absolute;
   margin-left: 6px;
   margin-top: 8px;
-  background-color: rgba(0, 0 ,0, 0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   border-radius: 3px;
 `;
 
