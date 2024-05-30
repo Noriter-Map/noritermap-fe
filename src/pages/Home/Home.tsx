@@ -259,6 +259,7 @@ export const Home = () => {
     }
   }, [isSideBarData]);
 
+  // /p/place/:facilityId 경로로 접속하였을 경우
   useEffect(() => {
     if (facilityId !== undefined && markersRef.current.length !== 0){
       handleMarkerClick(parseInt(facilityId));

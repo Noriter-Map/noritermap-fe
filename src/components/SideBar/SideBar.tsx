@@ -269,6 +269,10 @@ export const SideBar = ({
         distanceFromCur: 0.0,
       });
       setSideBarState("detail");
+
+      if (isOpen === false){
+        handleButtonClick();
+      }
     }
   }, [pathFacilityId]);
 
