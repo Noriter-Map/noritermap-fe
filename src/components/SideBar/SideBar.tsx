@@ -119,9 +119,10 @@ export const SideBar = ({
   const fetchSideBarData = async (
     lat: number,
     lng: number,
-    pageNumber: number
+    pageNumber: number,
+    pathKeyword: string | undefined,
   ) => {
-    const keyword = "";
+    const keyword = pathKeyword === undefined ? "" : pathKeyword;
     const curLatitude = lat.toString();
     const curLongitude = lng.toString();
     const size = 10;
@@ -171,7 +172,7 @@ export const SideBar = ({
       const currentLng = pos.coords.longitude;
       setIsCurrentLat(currentLat);
       setIsCurrentLng(currentLng);
-      fetchSideBarData(currentLat, currentLng, 0);
+      fetchSideBarData(currentLat, currentLng, 0, keyword);
       setSideBarState("");
     };
 
@@ -181,7 +182,7 @@ export const SideBar = ({
       const defaultLng = 126.851309;
       setIsCurrentLat(defaultLat);
       setIsCurrentLng(defaultLng);
-      fetchSideBarData(defaultLat, defaultLng, 0);
+      fetchSideBarData(defaultLat, defaultLng, 0, keyword);
       setSideBarState("");
     };
 
@@ -192,31 +193,6 @@ export const SideBar = ({
       );
     }
   }, [isOpen]);
-
-  //   useEffect(() => {
-  //     const handlePopState = () => {
-  //       const currentPath = window.location.pathname;
-
-  //       if (currentPath.includes("/p/place/")) {
-  //         const id = currentPath.split("/").pop();
-  //         if (id) {
-  //           setSelectedFacility({
-  //             ...selectedFacility,
-  //             facilityId: Number(id),
-  //           } as SearchFacility);
-  //           setSideBarState("detail");
-  //         }
-  //       } else if (currentPath.includes("/search/")) {
-  //         setSideBarState("search");
-  //       }
-  //     };
-
-  //     window.addEventListener("popstate", handlePopState);
-
-  //     return () => {
-  //       window.removeEventListener("popstate", handlePopState);
-  //     };
-  //   }, [selectedFacility]);
 
   const handleClickLogo = () => {
     if (isCurrentLat !== null && isCurrentLng !== null) {
@@ -230,7 +206,7 @@ export const SideBar = ({
 
       initializeOptionsState();
 
-      fetchSideBarData(isCurrentLat, isCurrentLng, 0);
+      fetchSideBarData(isCurrentLat, isCurrentLng, 0, keyword);
       setSideBarState("");
       navigate("/");
     }
@@ -272,7 +248,7 @@ export const SideBar = ({
       isCurrentLat !== null &&
       isCurrentLng !== null
     ) {
-      fetchSideBarData(isCurrentLat, isCurrentLng, page);
+      fetchSideBarData(isCurrentLat, isCurrentLng, page, keyword);
     }
   }, [page, sideBarState, isCurrentLat, isCurrentLng]);
 
