@@ -106,7 +106,6 @@ export const SideBar = ({
     setSelectedFacility(facility);
     navigate(`/p/place/${facility.facilityId}`);
     onMarkerClick(facility.facilityId);
-    console.log(sideBarState);
   };
 
   function formatDistance(distance: number): string {
@@ -144,7 +143,6 @@ export const SideBar = ({
       const response = await getFaciltySearch(queryParams);
       const myposition = await getMyPosition(lat, lng);
       setIsMyRegion(myposition);
-      console.log(response);
 
       setSideBarData((prevData) => {
         if (prevData && pageNumber > 0) {
@@ -160,7 +158,6 @@ export const SideBar = ({
         }
       });
       setIsSideBarData(response);
-      console.log(response.data);
       setHasMore(!response.data.last);
     } catch (error) {
       console.error("Search Error:", error);
@@ -288,7 +285,6 @@ export const SideBar = ({
       sideBarState === "search"
     ) {
       setSideBarData(sideBarSearchData);
-      console.log("?응?");
     }
   }, [page, sideBarState]);
 
@@ -300,7 +296,6 @@ export const SideBar = ({
       hasMore
     ) {
       fetchSideBarData(isCurrentLat, isCurrentLng, page);
-      console.log("너째문?");
     }
   }, [page]);
 
@@ -314,6 +309,7 @@ export const SideBar = ({
             setIsLoading={setLoading}
             setIsDefault={setIsDefault}
             setIsSideBarData={setIsSideBarData}
+            pathKeyword={keyword}
           />
         </StyledTopDiv>
         {selectedFacility && sideBarState === "detail" ? (

@@ -50,7 +50,6 @@ export const Review = ({ id, setIsUpdate }: DetailRightInfoProps) => {
     const fetchData = async () => {
       try {
         const response = await getFcInfoRight(id);
-        console.log(response);
         setIsReviewData(response);
       } catch (error) {
         console.error("Search Error:", error);
@@ -82,7 +81,6 @@ export const Review = ({ id, setIsUpdate }: DetailRightInfoProps) => {
       const fetchData = async () => {
         try {
           const response = await getFcInfoRight(id);
-          console.log(response);
           setIsReviewData(response);
           setIsUpdate(true);
         } catch (error) {

@@ -48,7 +48,6 @@ export const Detail = ({ id, setSelectedFacility }: DetailProps) => {
     const fetchData = async () => {
       try {
         const response = await getFcInfoTop(id);
-        console.log(response);
         setIsFcTopData(response);
       } catch (error) {
         console.error("Search Error:", error);

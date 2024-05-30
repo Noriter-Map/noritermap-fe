@@ -48,6 +48,7 @@ interface SearchProps {
   setIsSideBarData: Dispatch<
     SetStateAction<SearchFacilityListResponses | null>
   >;
+  pathKeyword: string | undefined;
 }
 
 export const Search = forwardRef(
@@ -57,6 +58,7 @@ export const Search = forwardRef(
       setIsLoading,
       setIsDefault,
       setIsSideBarData,
+        pathKeyword
     }: SearchProps,
     ref
   ) => {
@@ -206,10 +208,8 @@ export const Search = forwardRef(
             }
           }
         );
-        console.log(response);
         setIsDefault(false);
         setHasMore(!response.data.last);
-        console.log(hasMore);
         if (resetPage) setPage(1);
       } catch (error) {
         console.error("Search Error:", error);
@@ -228,17 +228,10 @@ export const Search = forwardRef(
       }
     };
 
-    useEffect(() => {
-      if (sideBarState === "search" && page > 0) {
-        handleSearch(false);
-      }
-    }, [page]);
-
     return (
       <StyledContainer>
         <StyledSearchBarWrapper ref={searchWrap}>
           <StyledSearchIcon src={SearchIcon} onClick={() => handleSearch()} />
-
           <StyledSearchBar
             ref={searchInput}
             placeholder="놀이시설 검색"
