@@ -85,7 +85,7 @@ export const Detail = ({ id, setSelectedFacility }: DetailProps) => {
 
   return (
     <div>
-      <StyledBack src={Back} onClick={handleBackButtonClick} />
+        <StyledBack src={Back} onClick={handleBackButtonClick} />
       {isFcTopData ? (
         <>
           <KakaoRoadview
