@@ -48,7 +48,9 @@ interface SearchProps {
   setIsSideBarData: Dispatch<
     SetStateAction<SearchFacilityListResponses | null>
   >;
+  sideBarSearchData: SearchFacilityListResponses | undefined;
   pathKeyword: string | undefined;
+  setPage: Dispatch<SetStateAction<number>>;
 }
 
 export const Search = forwardRef(
@@ -58,7 +60,9 @@ export const Search = forwardRef(
       setIsLoading,
       setIsDefault,
       setIsSideBarData,
+      sideBarSearchData,
       pathKeyword,
+      setPage,
     }: SearchProps,
     ref
   ) => {
@@ -191,23 +195,32 @@ export const Search = forwardRef(
 
       try {
         const response = await getFaciltySearch(queryParams);
-        setSideBarSearchData(
-          (prevData: SearchFacilityListResponses | undefined) => {
-            if (resetPage) {
-              return response;
-            } else if (prevData) {
-              return {
-                ...response,
-                data: {
-                  ...response.data,
-                  content: [...prevData.data.content, ...response.data.content],
-                },
-              };
-            } else {
-              return response;
+        if (keyword !== pathKeyword) {
+          setSideBarSearchData(response);
+          setIsSideBarData(response);
+          setPage(0);
+        } else {
+          setSideBarSearchData(
+            (prevData: SearchFacilityListResponses | undefined) => {
+              if (resetPage) {
+                return response;
+              } else if (prevData) {
+                return {
+                  ...response,
+                  data: {
+                    ...response.data,
+                    content: [
+                      ...prevData.data.content,
+                      ...response.data.content,
+                    ],
+                  },
+                };
+              } else {
+                return response;
+              }
             }
-          }
-        );
+          );
+        }
         setIsDefault(false);
         setHasMore(!response.data.last);
       } catch (error) {
