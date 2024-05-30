@@ -76,6 +76,9 @@ export const SideBar = ({
   const [sideBarData, setSideBarData] = useState<
     SearchFacilityListResponses | undefined
   >(undefined);
+  const [sideBarSearchData, setSideBarSearchData] = useState<
+    SearchFacilityListResponses | undefined
+  >(undefined);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isCurrentLat, setIsCurrentLat] = useState<number | null>(null);
@@ -90,6 +93,9 @@ export const SideBar = ({
   const [hasMore, setHasMore] = useState(true);
   const observer = useRef<IntersectionObserver | null>(null);
   const navigate = useNavigate();
+  const searchRef = useRef<{ handleSearch: (resetPage: boolean) => void }>(
+    null
+  );
 
   const handleButtonClick = () => {
     setIsOpen(!isOpen);
@@ -111,6 +117,7 @@ export const SideBar = ({
     }
   }
 
+  // 처음 나오는 데이터(나랑 제일 가까운 순으로)
   const fetchSideBarData = async (
     lat: number,
     lng: number,
@@ -152,6 +159,7 @@ export const SideBar = ({
         }
       });
       setIsSideBarData(response);
+      console.log(response.data);
       setHasMore(!response.data.last);
     } catch (error) {
       console.error("Search Error:", error);
@@ -168,6 +176,7 @@ export const SideBar = ({
       setIsCurrentLat(currentLat);
       setIsCurrentLng(currentLng);
       fetchSideBarData(currentLat, currentLng, 0);
+      setSideBarState("");
     };
 
     const handleGeolocationError = (err: GeolocationPositionError) => {
@@ -177,6 +186,7 @@ export const SideBar = ({
       setIsCurrentLat(defaultLat);
       setIsCurrentLng(defaultLng);
       fetchSideBarData(defaultLat, defaultLng, 0);
+      setSideBarState("");
     };
 
     if (isOpen) {
@@ -187,32 +197,33 @@ export const SideBar = ({
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    const handlePopState = () => {
-      const currentPath = window.location.pathname;
+  //   useEffect(() => {
+  //     const handlePopState = () => {
+  //       const currentPath = window.location.pathname;
 
-      if (currentPath.includes("/p/place/")) {
-        const id = currentPath.split("/").pop();
-        if (id) {
-          setSelectedFacility({
-            ...selectedFacility,
-            facilityId: Number(id),
-          } as SearchFacility);
-          setSideBarState("detail");
-        }
-      } else if (currentPath.includes("/search/")) {
-        setSideBarState("");
-      }
-    };
+  //       if (currentPath.includes("/p/place/")) {
+  //         const id = currentPath.split("/").pop();
+  //         if (id) {
+  //           setSelectedFacility({
+  //             ...selectedFacility,
+  //             facilityId: Number(id),
+  //           } as SearchFacility);
+  //           setSideBarState("detail");
+  //         }
+  //       } else if (currentPath.includes("/search/")) {
+  //         setSideBarState("search");
+  //       }
+  //     };
 
-    window.addEventListener("popstate", handlePopState);
+  //     window.addEventListener("popstate", handlePopState);
 
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-    };
-  }, [selectedFacility]);
+  //     return () => {
+  //       window.removeEventListener("popstate", handlePopState);
+  //     };
+  //   }, [selectedFacility]);
 
   const handleClickLogo = () => {
+    setPage(0);
     if (isCurrentLat !== null && isCurrentLng !== null) {
       const initializeOptionsState = () => {
         setOptionsState({
@@ -226,6 +237,7 @@ export const SideBar = ({
 
       fetchSideBarData(isCurrentLat, isCurrentLng, 0);
       setSideBarState("");
+      navigate("/");
     }
   };
 
@@ -233,25 +245,60 @@ export const SideBar = ({
     return number.toFixed(1);
   }
 
+  const currentSideBarData =
+    sideBarState === "search" ? sideBarSearchData : sideBarData;
+
   const lastFacilityElementRef = useCallback(
     (node: HTMLElement | null) => {
-      if (loading) return;
+      if (
+        loading ||
+        !hasMore ||
+        (currentSideBarData && currentSideBarData?.data.content.length < 10)
+      )
+        return; // 로딩 중이거나 더 불러올 데이터가 없으면 return
+
       if (observer.current) observer.current.disconnect();
+
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          setPage((prevPage) => prevPage + 1);
+          if (sideBarState === "search" && searchRef.current) {
+            searchRef.current.handleSearch(false);
+          } else {
+            setPage((prevPage) => prevPage + 1);
+          }
         }
       });
+
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore]
+    [loading, hasMore, currentSideBarData]
   );
 
   useEffect(() => {
-    if (isCurrentLat !== null && isCurrentLng !== null) {
-      fetchSideBarData(isCurrentLat, isCurrentLng, page);
+    if (sideBarState === "search" && sideBarSearchData) {
+      setPage(0); // 페이지를 초기화합니다.
+      setSideBarData(sideBarSearchData); // sideBarSearchData를 sideBarData로 설정합니다.
     }
-  }, [page]);
+  }, [sideBarSearchData]);
+
+  useEffect(() => {
+    if (
+      sideBarState !== "search" &&
+      isCurrentLat !== null &&
+      isCurrentLng !== null &&
+      hasMore
+    ) {
+      fetchSideBarData(isCurrentLat, isCurrentLng, page);
+      console.log("너째문?");
+    }
+    if (
+      isCurrentLat !== null &&
+      isCurrentLng !== null &&
+      sideBarState === "search"
+    ) {
+      setSideBarData(sideBarSearchData);
+    }
+  }, [page, sideBarState]);
 
   return (
     <>
@@ -259,7 +306,7 @@ export const SideBar = ({
         <StyledTopDiv>
           <StyledLogo src={Logo} onClick={handleClickLogo} />
           <Search
-            setSideBarData={setSideBarData}
+            setSideBarSearchData={setSideBarSearchData}
             setIsLoading={setLoading}
             setIsDefault={setIsDefault}
             setIsSideBarData={setIsSideBarData}
@@ -284,7 +331,8 @@ export const SideBar = ({
           <StyledNoResultContainer>
             <StyledNoResult>{error}</StyledNoResult>
           </StyledNoResultContainer>
-        ) : sideBarData && sideBarData.data.content.length === 0 ? (
+        ) : currentSideBarData &&
+          currentSideBarData.data.content.length === 0 ? (
           <StyledNoResultContainer>
             <StyledNoResultImg src={NoResult} />
             <StyledNoResult>검색된 시설이 없습니다.</StyledNoResult>
@@ -293,7 +341,7 @@ export const SideBar = ({
           <StyledSearchResultContainer>
             {isDefault && (
               <StyledMyReginContainer>
-                {sideBarData && (
+                {currentSideBarData && (
                   <>
                     <StyledMyRegionIcon src={MyRegionIcon} />{" "}
                     <StyledMyRegionText>
@@ -303,19 +351,26 @@ export const SideBar = ({
                 )}
               </StyledMyReginContainer>
             )}
-            {sideBarData && (
+            {currentSideBarData && (
               <StyledTextLine>
                 <StyledTextBoldStyle>내 주변</StyledTextBoldStyle>
                 <StyledTextMediumStyle>놀이시설</StyledTextMediumStyle>
                 <StyledLineStyle />
               </StyledTextLine>
             )}
-            {sideBarData ? (
-              sideBarData.data.content.map((facility, index) => {
-                if (sideBarData.data.content.length === index + 1) {
+            {currentSideBarData ? (
+              currentSideBarData.data.content.map((facility, index) => {
+                if (currentSideBarData.data.content.length === index + 1) {
+                  const isLastElement =
+                    currentSideBarData.data.content.length === index + 1;
                   return (
                     <StyledSearchResultWrapper
-                      ref={lastFacilityElementRef}
+                      ref={
+                        isLastElement &&
+                        currentSideBarData.data.content.length >= 10
+                          ? lastFacilityElementRef
+                          : null
+                      }
                       key={facility.facilityId}
                     >
                       <StyledSearchResult>

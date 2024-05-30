@@ -11,20 +11,20 @@ export const StyledSearchBarWrapper = styled.div`
   margin-top: 75px;
   position: relative;
   width: 430px;
-  height: 54px;
+  height: 65px;
 `;
 
 export const StyledSearchBar = styled.input`
   padding-right: 54px;
-  width: 354px;
-  height: 50px;t
+  width: 350px;
+  height: 65px;
   background-color: #ffffff;
-  border-radius: 5px;
+  border-radius: 12px;
   border: 1px solid #c9c9c9;
-  font-size: 18px;
+  font-size: 20px;
   color: #000000;
   line-height: 44px;
-  padding-left: 20px;
+  padding-left: 24px;
 
   &::placeholder {
     color: rgb(156, 156, 156);
@@ -40,9 +40,9 @@ export const StyledSearchBar = styled.input`
 
 export const StyledSearchIcon = styled.img`
   position: absolute;
-  right: 8px;
+  right: 6px;
   top: 50%;
-  transform: translateY(-48%);
+  transform: translateY(-43%);
   width: 42px;
   height: auto;
   &:hover {
@@ -59,7 +59,7 @@ export const StyledSearchOptionContainer = styled.div`
   height: 516px;
   background-color: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.25);
-  border-radius: 13px;
+  border-radius: 17px;
   box-shadow: 4px 4px 4px 0px rgba(0, 0, 0, 0.25);
 `;
 
@@ -127,8 +127,8 @@ export const StyledLabelText = styled.label`
 `;
 
 export const StyledChipContainer = styled.div`
-  margin-top: 14px;
-  width: 423px;
+  margin-top: 20px;
+  width: 400px;
   display: flex;
   flex-direction: row;
   gap: 15px;

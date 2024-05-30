@@ -14,7 +14,6 @@ import {
   StyledGoDetail,
 } from "./Overlay.style";
 import { getReviewData } from "../../apis/getReviewData";
-import { OverlayReviewResponses } from "../../types/Map.type";
 
 interface OverlayProps {
   facility_id: string;
@@ -78,7 +77,7 @@ export const Overlay = ({
           <Address>{addr}</Address>
           <Details>
             <StyledGoDetail onClick={() => onDetailClick(facility_id)}>
-              상세보기
+              상세 정보 보기
             </StyledGoDetail>
             <StyledGoDetail> · </StyledGoDetail>
             <StyledGoDetail

@@ -129,15 +129,21 @@ export const StyledSearchResultWrapper = styled.div`
   width: 100%;
   height: fit-content;
   position: relative;
-  
-   &:after {
-    content: '';
+
+  &:after {
+    content: "";
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
     height: 1px;
-    background: linear-gradient(to right, transparent 3%, rgb(0, 0, 0, 0.25) 3%, rgb(0, 0, 0, 0.25) 97%, transparent 97%);
+    background: linear-gradient(
+      to right,
+      transparent 3%,
+      rgb(0, 0, 0, 0.25) 3%,
+      rgb(0, 0, 0, 0.25) 97%,
+      transparent 97%
+    );
   }
 `;
 
