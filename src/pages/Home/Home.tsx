@@ -12,6 +12,7 @@ import CurrentIcon from "../../assets/CurrentMarker.svg";
 import { getReviewData } from "../../apis/getReviewData";
 import ReactDOM from "react-dom";
 import { createRoot } from "react-dom/client";
+import {parseInt} from "lodash";
 
 declare global {
   interface Window {
@@ -281,31 +282,15 @@ export const Home = () => {
   };
 
   const handleMarkerClick = (facilityId: number) => {
-    const markerData = markerDatas.find(
-      (marker) => marker.facility_id === facilityId.toString()
+    const targetMarker = markersRef.current.find(
+        (marker) => marker.facilityId === facilityId.toString()
     );
 
-    if (markerData) {
-      const lat = parseFloat(markerData.lat);
-      const lng = parseFloat(markerData.lot);
-      setFocusPosition({ lat, lng });
-      const position = new window.kakao.maps.LatLng(lat, lng);
+    if (targetMarker) {
+      const position = targetMarker.getPosition();
+
       mapRef.current.panTo(position);
       mapRef.current.setLevel(2);
-
-      // 해당 마커를 찾고 클릭 이벤트 트리거
-      const marker = markersRef.current.find(
-        (m) => m.facilityId === facilityId.toString()
-      );
-      if (marker) {
-        // 클릭된 마커 보이기
-        marker.setMap(mapRef.current);
-        window.kakao.maps.event.trigger(marker, "click");
-      } else {
-        console.error(`Marker not found for facilityId: ${facilityId}`);
-      }
-    } else {
-      console.error(`Marker data not found for facilityId: ${facilityId}`);
     }
   };
 
