@@ -245,44 +245,24 @@ export const SideBar = ({
 
   const lastFacilityElementRef = useCallback(
     (node: HTMLElement | null) => {
-      if (
-        loading ||
-        !hasMore ||
-        (currentSideBarData && currentSideBarData?.data.content.length < 10)
-      )
-        return; // 로딩 중이거나 더 불러올 데이터가 없으면 return
+      if (loading || !hasMore) return;
 
       if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          if (sideBarState === "search" && searchRef.current) {
-            searchRef.current.handleSearch(false);
-          } else {
-            setPage((prevPage) => prevPage + 1);
-          }
+          setPage((prevPage) => prevPage + 1);
         }
       });
 
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore, currentSideBarData]
+    [loading, hasMore]
   );
 
   useEffect(() => {
-    if (sideBarState === "search" && sideBarSearchData) {
-      setPage(0); // 페이지를 초기화합니다.
-      setSideBarData(sideBarSearchData); // sideBarSearchData를 sideBarData로 설정합니다.
-    }
-  }, [sideBarSearchData]);
-
-  useEffect(() => {
-    if (
-      isCurrentLat !== null &&
-      isCurrentLng !== null &&
-      sideBarState === "search"
-    ) {
-      setSideBarData(sideBarSearchData);
+    if (sideBarState === "search" && page > 0 && searchRef.current) {
+      searchRef.current.handleSearch(false);
     }
   }, [page, sideBarState]);
 
@@ -290,12 +270,11 @@ export const SideBar = ({
     if (
       sideBarState !== "search" &&
       isCurrentLat !== null &&
-      isCurrentLng !== null &&
-      hasMore
+      isCurrentLng !== null
     ) {
       fetchSideBarData(isCurrentLat, isCurrentLng, page);
     }
-  }, [page]);
+  }, [page, sideBarState, isCurrentLat, isCurrentLng]);
 
   return (
     <>
@@ -307,6 +286,7 @@ export const SideBar = ({
             setIsLoading={setLoading}
             setIsDefault={setIsDefault}
             setIsSideBarData={setIsSideBarData}
+            ref={searchRef}
             pathKeyword={keyword}
           />
         </StyledTopDiv>
@@ -361,6 +341,7 @@ export const SideBar = ({
                 if (currentSideBarData.data.content.length === index + 1) {
                   const isLastElement =
                     currentSideBarData.data.content.length === index + 1;
+                  const key = `${facility.pfctNm}-${index}`;
                   return (
                     <StyledSearchResultWrapper
                       ref={
@@ -369,7 +350,7 @@ export const SideBar = ({
                           ? lastFacilityElementRef
                           : null
                       }
-                      key={facility.facilityId}
+                      key={key}
                     >
                       <StyledSearchResult>
                         <StyledFacilityTitle

@@ -58,7 +58,7 @@ export const Search = forwardRef(
       setIsLoading,
       setIsDefault,
       setIsSideBarData,
-        pathKeyword
+      pathKeyword,
     }: SearchProps,
     ref
   ) => {
@@ -72,7 +72,7 @@ export const Search = forwardRef(
     const [isCurrentLat, setIsCurrentLat] = useState<number | null>(null);
     const [isCurrentLng, setIsCurrentLng] = useState<number | null>(null);
     const [sideBarState, setSideBarState] = useRecoilState(SideBarState);
-    const [page, setPage] = useState(0);
+    const [page, setPageState] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const navigate = useNavigate();
 
@@ -210,7 +210,6 @@ export const Search = forwardRef(
         );
         setIsDefault(false);
         setHasMore(!response.data.last);
-        if (resetPage) setPage(1);
       } catch (error) {
         console.error("Search Error:", error);
       } finally {
@@ -229,8 +228,8 @@ export const Search = forwardRef(
     };
 
     useEffect(() => {
-      if (pathKeyword !== undefined){
-        if (searchInput.current){
+      if (pathKeyword !== undefined) {
+        if (searchInput.current) {
           searchInput.current.value = pathKeyword;
           setSearchKeyword(pathKeyword);
         }

@@ -12,7 +12,7 @@ import CurrentIcon from "../../assets/CurrentMarker.svg";
 import { getReviewData } from "../../apis/getReviewData";
 import ReactDOM from "react-dom";
 import { createRoot } from "react-dom/client";
-import {parseInt} from "lodash";
+import { parseInt } from "lodash";
 
 declare global {
   interface Window {
@@ -132,7 +132,10 @@ export const Home = () => {
       window.kakao.maps.event.addListener(marker, "mouseover", () => {
         // 클릭된 마커가 없고, mouseover된 마커가 클릭된 마커가 아니면
         // 마커의 이미지를 오버 이미지로 변경합니다
-        if (!clickedMarkerAndOverlayRef.current || clickedMarkerAndOverlayRef.current[0] !== marker) {
+        if (
+          !clickedMarkerAndOverlayRef.current ||
+          clickedMarkerAndOverlayRef.current[0] !== marker
+        ) {
           marker.setImage(overImage);
         }
       });
@@ -140,7 +143,9 @@ export const Home = () => {
       window.kakao.maps.event.addListener(marker, "mouseout", () => {
         // 클릭된 마커가 없고, mouseout된 마커가 클릭된 마커가 아니면
         // 마커의 이미지를 기본 이미지로 변경합니다
-        if (!clickedMarkerAndOverlayRef.current || clickedMarkerAndOverlayRef.current[0] !== marker
+        if (
+          !clickedMarkerAndOverlayRef.current ||
+          clickedMarkerAndOverlayRef.current[0] !== marker
         ) {
           marker.setImage(normalImage);
         }
@@ -148,11 +153,14 @@ export const Home = () => {
 
       window.kakao.maps.event.addListener(marker, "click", async () => {
         // 클릭된 마커가 있고, 그것이 클릭한 마커와 같다면, 기본 이미지로 변경한다.
-        if (clickedMarkerAndOverlayRef.current && clickedMarkerAndOverlayRef.current[0] === marker) {
+        if (
+          clickedMarkerAndOverlayRef.current &&
+          clickedMarkerAndOverlayRef.current[0] === marker
+        ) {
           marker.setImage(normalImage);
 
           // 만약 오버레이가 띄워져 있다면, 제거하고 그 아래 로직은 수행하지 않는다.
-          if (clickedMarkerAndOverlayRef.current[1]){
+          if (clickedMarkerAndOverlayRef.current[1]) {
             clickedMarkerAndOverlayRef.current[1].setMap(null);
             clickedMarkerAndOverlayRef.current = null;
             return;
@@ -161,10 +169,14 @@ export const Home = () => {
 
         // 클릭된 마커가 없거나, click 마커가 클릭된 마커가 아니면
         // 마커의 이미지를 클릭 이미지로 변경합니다
-        if (!clickedMarkerAndOverlayRef.current || clickedMarkerAndOverlayRef.current[0] !== marker) {
+        if (
+          !clickedMarkerAndOverlayRef.current ||
+          clickedMarkerAndOverlayRef.current[0] !== marker
+        ) {
           // 클릭된 마커 객체가 null이 아니면
           // 클릭된 마커의 이미지를 기본 이미지로 변경하고
-          !!clickedMarkerAndOverlayRef.current && clickedMarkerAndOverlayRef.current[0].setImage(normalImage);
+          !!clickedMarkerAndOverlayRef.current &&
+            clickedMarkerAndOverlayRef.current[0].setImage(normalImage);
 
           if (clickedMarkerAndOverlayRef.current) {
             clickedMarkerAndOverlayRef.current[0] = marker;
@@ -283,7 +295,7 @@ export const Home = () => {
 
   const handleMarkerClick = (facilityId: number) => {
     const targetMarker = markersRef.current.find(
-        (marker) => marker.facilityId === facilityId.toString()
+      (marker) => marker.facilityId === facilityId.toString()
     );
 
     if (targetMarker) {
@@ -293,11 +305,14 @@ export const Home = () => {
       mapRef.current.setLevel(2);
 
       // 클릭된 마커가 있고, 그것이 타겟 마커와 다르다면, 기본 이미지로 변경한다.
-      if (clickedMarkerAndOverlayRef.current && clickedMarkerAndOverlayRef.current[0] !== targetMarker) {
+      if (
+        clickedMarkerAndOverlayRef.current &&
+        clickedMarkerAndOverlayRef.current[0] !== targetMarker
+      ) {
         clickedMarkerAndOverlayRef.current[0].setImage(normalImage);
 
         // 만약 오버레이가 띄워져 있다면, 제거한다
-        if (clickedMarkerAndOverlayRef.current[1]){
+        if (clickedMarkerAndOverlayRef.current[1]) {
           clickedMarkerAndOverlayRef.current[1].setMap(null);
         }
 
