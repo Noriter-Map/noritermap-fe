@@ -228,6 +228,15 @@ export const Search = forwardRef(
       }
     };
 
+    useEffect(() => {
+      if (pathKeyword !== undefined){
+        if (searchInput.current){
+          searchInput.current.value = pathKeyword;
+          setSearchKeyword(pathKeyword);
+        }
+      }
+    }, [pathKeyword]);
+
     return (
       <StyledContainer>
         <StyledSearchBarWrapper ref={searchWrap}>
