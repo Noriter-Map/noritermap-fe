@@ -300,14 +300,10 @@ export const Home = () => {
         if (clickedMarkerAndOverlayRef.current[1]){
           clickedMarkerAndOverlayRef.current[1].setMap(null);
         }
-        
+
         window.kakao.maps.event.trigger(targetMarker, "click");
       }
-
     }
-
-
-
   };
 
   const handleDetailClick = (facilityId: string) => {
