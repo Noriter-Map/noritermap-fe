@@ -102,10 +102,11 @@ export const SideBar = ({
   };
 
   const handleFacilityClick = (facility: SearchFacility) => {
+    setSideBarState("detail");
     setSelectedFacility(facility);
     navigate(`/p/place/${facility.facilityId}`);
-    setSideBarState("detail");
     onMarkerClick(facility.facilityId);
+    console.log(sideBarState);
   };
 
   function formatDistance(distance: number): string {
@@ -223,7 +224,6 @@ export const SideBar = ({
   //   }, [selectedFacility]);
 
   const handleClickLogo = () => {
-    setPage(0);
     if (isCurrentLat !== null && isCurrentLng !== null) {
       const initializeOptionsState = () => {
         setOptionsState({
@@ -283,6 +283,17 @@ export const SideBar = ({
 
   useEffect(() => {
     if (
+      isCurrentLat !== null &&
+      isCurrentLng !== null &&
+      sideBarState === "search"
+    ) {
+      setSideBarData(sideBarSearchData);
+      console.log("?응?");
+    }
+  }, [page, sideBarState]);
+
+  useEffect(() => {
+    if (
       sideBarState !== "search" &&
       isCurrentLat !== null &&
       isCurrentLng !== null &&
@@ -291,14 +302,7 @@ export const SideBar = ({
       fetchSideBarData(isCurrentLat, isCurrentLng, page);
       console.log("너째문?");
     }
-    if (
-      isCurrentLat !== null &&
-      isCurrentLng !== null &&
-      sideBarState === "search"
-    ) {
-      setSideBarData(sideBarSearchData);
-    }
-  }, [page, sideBarState]);
+  }, [page]);
 
   return (
     <>
