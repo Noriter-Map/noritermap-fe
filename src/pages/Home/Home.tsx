@@ -303,11 +303,7 @@ export const Home = () => {
 
         window.kakao.maps.event.trigger(targetMarker, "click");
       }
-
     }
-
-
-
   };
 
   const handleDetailClick = (facilityId: string) => {
