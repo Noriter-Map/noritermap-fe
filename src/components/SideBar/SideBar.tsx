@@ -56,7 +56,7 @@ import { SideBarState } from "../../recoil/SideBarState";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FetchingCurLocation } from "../FetchingCurLocation/FetchingCurLocation";
-import {parseInt} from "lodash";
+import { parseInt } from "lodash";
 
 interface SideBarProps {
   keyword?: string;
@@ -71,7 +71,7 @@ export const SideBar = ({
   onMarkerClick,
   setIsSideBarData,
 }: SideBarProps) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setisOpen] = useState(true);
   const [sideBarData, setSideBarData] = useState<
     SearchFacilityListResponses | undefined
   >(undefined);
@@ -92,10 +92,12 @@ export const SideBar = ({
   const [hasMore, setHasMore] = useState(true);
   const observer = useRef<IntersectionObserver | null>(null);
   const navigate = useNavigate();
-  const searchRef = useRef<{ handleSearch: (resetPage: boolean) => void }>(null);
+  const searchRef = useRef<{ handleSearch: (resetPage: boolean) => void }>(
+    null
+  );
 
   const handleButtonClick = () => {
-    setIsOpen(!isOpen);
+    setisOpen(!isOpen);
   };
 
   const handleFacilityClick = (facility: SearchFacility) => {
@@ -119,7 +121,7 @@ export const SideBar = ({
     lat: number,
     lng: number,
     pageNumber: number,
-    pathKeyword: string | undefined,
+    pathKeyword: string | undefined
   ) => {
     const keyword = pathKeyword === undefined ? "" : pathKeyword;
     const curLatitude = lat.toString();
@@ -185,13 +187,13 @@ export const SideBar = ({
       setSideBarState("");
     };
 
-    if (pathFacilityId === undefined && isOpen) {
+    if (isOpen) {
       navigator.geolocation.getCurrentPosition(
         handleGeolocationSuccess,
         handleGeolocationError
       );
     }
-  }, [isOpen]);
+  }, []);
 
   const handleClickLogo = () => {
     if (isCurrentLat !== null && isCurrentLng !== null) {
@@ -221,9 +223,9 @@ export const SideBar = ({
   const lastFacilityElementRef = useCallback(
     (node: HTMLElement | null) => {
       if (
-          loading ||
-          !hasMore ||
-          (currentSideBarData && currentSideBarData?.data.content.length < 10)
+        loading ||
+        !hasMore ||
+        (currentSideBarData && currentSideBarData?.data.content.length < 10)
       )
         return;
 
@@ -231,11 +233,7 @@ export const SideBar = ({
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          if (sideBarState === "search" && searchRef.current) {
-            searchRef.current.handleSearch(false);
-          } else {
-            setPage((prevPage) => prevPage + 1);
-          }
+          setPage((prevPage) => prevPage + 1);
         }
       });
 
@@ -245,41 +243,46 @@ export const SideBar = ({
   );
 
   useEffect(() => {
-    if (sideBarState === "search" && page > 0 && searchRef.current && pathFacilityId === undefined) {
+    if (
+      sideBarState === "search" &&
+      page > 0 &&
+      searchRef.current &&
+      pathFacilityId === undefined
+    ) {
       searchRef.current.handleSearch(false);
     }
-  }, [page, sideBarState]);
+  }, [page]);
 
   useEffect(() => {
     if (
       sideBarState !== "search" &&
       isCurrentLat !== null &&
       isCurrentLng !== null &&
-        pathFacilityId === undefined
+      pathFacilityId === undefined
     ) {
       fetchSideBarData(isCurrentLat, isCurrentLng, page, keyword);
     }
   }, [page, sideBarState, isCurrentLat, isCurrentLng]);
 
   useEffect(() => {
-    if (pathFacilityId !== undefined){
+    if (pathFacilityId !== undefined) {
       setSelectedFacility({
         facilityId: parseInt(pathFacilityId),
-        pfctNm: '',
-        ronaAddr: '',
-        lotnoAddr: '',
-        instlPlaceCdNm: '',
-        prvtPblcYnCdNm: '',
-        idrodrCdNm: '',
-        latCrtsVl: '',
-        lotCrtsVl: '',
+        pfctNm: "",
+        ronaAddr: "",
+        lotnoAddr: "",
+        instlPlaceCdNm: "",
+        prvtPblcYnCdNm: "",
+        idrodrCdNm: "",
+        latCrtsVl: "",
+        lotCrtsVl: "",
         rating: 0.0,
         reviewCnt: 0.0,
         distanceFromCur: 0.0,
       });
       setSideBarState("detail");
 
-      if (isOpen === false){
+      if (isOpen === false) {
         handleButtonClick();
       }
     }
@@ -292,11 +295,13 @@ export const SideBar = ({
           <StyledLogo src={Logo} onClick={handleClickLogo} />
           <Search
             setSideBarSearchData={setSideBarSearchData}
+            sideBarSearchData={sideBarSearchData}
             setIsLoading={setLoading}
             setIsDefault={setIsDefault}
             setIsSideBarData={setIsSideBarData}
             ref={searchRef}
             pathKeyword={keyword}
+            setPage={setPage}
           />
         </StyledTopDiv>
         {selectedFacility && sideBarState === "detail" ? (
