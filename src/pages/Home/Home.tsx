@@ -291,7 +291,23 @@ export const Home = () => {
 
       mapRef.current.setCenter(position);
       mapRef.current.setLevel(2);
+
+      // 클릭된 마커가 있고, 그것이 타겟 마커와 다르다면, 기본 이미지로 변경한다.
+      if (clickedMarkerAndOverlayRef.current && clickedMarkerAndOverlayRef.current[0] !== targetMarker) {
+        clickedMarkerAndOverlayRef.current[0].setImage(normalImage);
+
+        // 만약 오버레이가 띄워져 있다면, 제거한다
+        if (clickedMarkerAndOverlayRef.current[1]){
+          clickedMarkerAndOverlayRef.current[1].setMap(null);
+        }
+        
+        window.kakao.maps.event.trigger(targetMarker, "click");
+      }
+
     }
+
+
+
   };
 
   const handleDetailClick = (facilityId: string) => {
