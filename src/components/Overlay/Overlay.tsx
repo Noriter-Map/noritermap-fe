@@ -79,14 +79,6 @@ export const Overlay = ({
             <StyledGoDetail onClick={() => onDetailClick(facility_id)}>
               상세 정보 보기
             </StyledGoDetail>
-            <StyledGoDetail> · </StyledGoDetail>
-            <StyledGoDetail
-              onClick={() => {
-                alert("열심히 준비 중이에요!");
-              }}
-            >
-              {/*정보 수정 제안*/}
-            </StyledGoDetail>
           </Details>
         </CustomOverlay>
       )}
