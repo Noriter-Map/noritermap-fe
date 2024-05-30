@@ -220,13 +220,22 @@ export const SideBar = ({
 
   const lastFacilityElementRef = useCallback(
     (node: HTMLElement | null) => {
-      if (loading || !hasMore) return;
+      if (
+          loading ||
+          !hasMore ||
+          (currentSideBarData && currentSideBarData?.data.content.length < 10)
+      )
+        return;
 
       if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          setPage((prevPage) => prevPage + 1);
+          if (sideBarState === "search" && searchRef.current) {
+            searchRef.current.handleSearch(false);
+          } else {
+            setPage((prevPage) => prevPage + 1);
+          }
         }
       });
 
