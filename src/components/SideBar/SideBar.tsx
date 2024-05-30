@@ -93,9 +93,7 @@ export const SideBar = ({
   const [hasMore, setHasMore] = useState(true);
   const observer = useRef<IntersectionObserver | null>(null);
   const navigate = useNavigate();
-  const searchRef = useRef<{ handleSearch: (resetPage: boolean) => void }>(
-    null
-  );
+  const searchRef = useRef<{ handleSearch: (resetPage: boolean) => void }>(null);
 
   const handleButtonClick = () => {
     setIsOpen(!isOpen);
