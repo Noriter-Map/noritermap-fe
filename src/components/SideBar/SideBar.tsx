@@ -250,9 +250,7 @@ export const SideBar = ({
       pathFacilityId === undefined
     ) {
       searchRef.current.handleSearch(false);
-      console.log("???");
     }
-    console.log("??");
   }, [page]);
 
   useEffect(() => {

@@ -243,7 +243,6 @@ export const Home = () => {
       const lat = parseFloat(firstFacility.latCrtsVl);
       const lng = parseFloat(firstFacility.lotCrtsVl);
       const position = new window.kakao.maps.LatLng(lat, lng);
-      console.log(isSideBarData);
       handleMarkerClick(firstFacility.facilityId);
       mapRef.current.panTo(position);
       mapRef.current.setLevel(3);
@@ -298,8 +297,6 @@ export const Home = () => {
     const targetMarker = markersRef.current.find(
       (marker) => marker.facilityId === facilityId.toString()
     );
-
-    console.log(targetMarker);
 
     if (targetMarker) {
       const position = targetMarker.getPosition();
