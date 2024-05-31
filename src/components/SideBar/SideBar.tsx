@@ -187,7 +187,7 @@ export const SideBar = ({
       setSideBarState("");
     };
 
-    if (isOpen) {
+    if (isOpen && pathFacilityId === undefined) {
       navigator.geolocation.getCurrentPosition(
         handleGeolocationSuccess,
         handleGeolocationError
