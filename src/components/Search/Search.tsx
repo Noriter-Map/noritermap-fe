@@ -195,7 +195,7 @@ export const Search = forwardRef(
 
       try {
         const response = await getFaciltySearch(queryParams);
-        if (keyword !== pathKeyword) {
+        if (keyword !== pathKeyword && resetPage) {
           setSideBarSearchData(response);
           setIsSideBarData(response);
           setPage(0);

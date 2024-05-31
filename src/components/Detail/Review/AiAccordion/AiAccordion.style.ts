@@ -52,7 +52,7 @@ export const StyledArrowIcon = styled.img<ArrowProps>`
   transition: transform 0.3s ease;
 `;
 
-export const StyledAccordionContent = styled.div<{ $isOpen: boolean }>`
+export const StyledAccordionContent = styled.div<{ isOpen: boolean }>`
   width: 90%;
   color: #000000;
   font-size: 14px;
@@ -61,5 +61,5 @@ export const StyledAccordionContent = styled.div<{ $isOpen: boolean }>`
   margin-left: 0.5rem;
   word-break: keep-all;
 
-  display: ${({ $isOpen }) => ($isOpen ? "block" : "none")};
+  display: ${({ isOpen }) => (isOpen ? "block" : "none")};
 `;

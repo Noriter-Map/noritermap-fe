@@ -39,7 +39,7 @@ export const AiAccordion = ({ isReviewData }: AiAccodianProps) => {
             )}
           </StyledAccordionHeaderWrapper>
         </StyledAccordionHeaderContainer>
-        <StyledAccordionContent $isOpen={isAccordionOpen}>
+        <StyledAccordionContent isOpen={isAccordionOpen}>
           {isReviewData.data.aiSummary}
         </StyledAccordionContent>
       </StyledAccordionContainer>
