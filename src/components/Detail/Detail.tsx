@@ -7,17 +7,17 @@ import {
   StyledTopTitle,
   StyledTopTitleContainer,
   StyledTopWrapper,
-    StyledShare,
+  StyledShare,
   StyledShareModalContainer,
   StyledShareModalTitle,
   StyledDeleteButton,
   StyledUrlCopyWrapper,
   StyledUrlTextBox,
-  StyledCopyTextBox
+  StyledCopyTextBox,
 } from "./Detail.style";
 import Back from "../../assets/BackIcon.svg";
-import Share from "../../assets/Share.svg"
-import { useNavigate } from "react-router-dom";
+import Share from "../../assets/Share.svg";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FacilityInfoTop, SearchFacility } from "../../types/SearchOption.type";
 import { getFcInfoTop } from "../../apis/getFcInfoTop";
 import KakaoRoadview from "../RoadView/RoadView";
@@ -40,6 +40,8 @@ import DeleteIcon from "../../assets/Delete.svg";
 import { DetailInfoTab } from "./DetailInfoTab/DetailInfoTab";
 import { Review } from "./Review/Review";
 import { toast } from "react-toastify";
+import { useRecoilState } from "recoil";
+import { SideBarState } from "../../recoil/SideBarState";
 
 interface DetailProps {
   id: number;
@@ -50,9 +52,11 @@ export const Detail = ({ id, setSelectedFacility }: DetailProps) => {
   const [currentTab, clickTab] = useState(0);
   const [isFcTopData, setIsFcTopData] = useState<FacilityInfoTop>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [isUpdate, setIsUpdate] = useState(false);
   const [isShareClicked, setIsShareClicked] = useState(false);
+  const [sideBarState, setSideBarState] = useRecoilState(SideBarState);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,32 +89,45 @@ export const Detail = ({ id, setSelectedFacility }: DetailProps) => {
     if (setSelectedFacility) {
       setSelectedFacility(null);
     }
-    navigate(-1);
+
+    if (sideBarState === "detail") {
+      const searchState = location.state?.fromSearch || false;
+      if (searchState) {
+        const searchKeyword = location.state?.searchKeyword || "";
+        setSideBarState("search");
+        navigate(`/search/${searchKeyword}`);
+      } else {
+        setSideBarState("");
+        navigate("/");
+      }
+    }
   };
 
   const handleShareButtonClick = () => {
-    if (isShareClicked){
+    if (isShareClicked) {
       setIsShareClicked(false);
-    }else{
+    } else {
       setIsShareClicked(true);
     }
-  }
+  };
 
   const handleShareModalDeleteButtonClick = () => {
-    if (isShareClicked){
+    if (isShareClicked) {
       setIsShareClicked(false);
     }
-  }
+  };
 
   const handleCopyUrlClick = async (facilityId: number) => {
     try {
-      await navigator.clipboard.writeText(`${process.env.REACT_APP_LOCAL_URL}p/place/${facilityId}`);
+      await navigator.clipboard.writeText(
+        `${process.env.REACT_APP_LOCAL_URL}p/place/${facilityId}`
+      );
       toast("링크가 복사되었습니다. ✨\n");
       toast.clearWaitingQueue();
     } catch (e) {
       toast("링크 복사에 실패하였습니다. 🚨");
     }
-  }
+  };
 
   function formatToOneDecimalPlace(number: number) {
     return number.toFixed(1);
@@ -120,20 +137,30 @@ export const Detail = ({ id, setSelectedFacility }: DetailProps) => {
     <div>
       {isFcTopData ? (
         <>
-        <StyledBack src={Back} onClick={handleBackButtonClick} />
-        <StyledShare src={Share} onClick={handleShareButtonClick} title="공유하기"></StyledShare>
-          {
-              isShareClicked && (
-                  <StyledShareModalContainer onClick={(e) => e.stopPropagation()}>
-                    <StyledShareModalTitle>공유하기</StyledShareModalTitle>
-                    <StyledDeleteButton src={DeleteIcon} onClick={handleShareModalDeleteButtonClick}></StyledDeleteButton>
-                    <StyledUrlCopyWrapper onClick={() => handleCopyUrlClick(isFcTopData.data.facilityId)}>
-                      <StyledUrlTextBox>{process.env.REACT_APP_LOCAL_URL}p/place/{isFcTopData.data.facilityId}</StyledUrlTextBox>
-                      <StyledCopyTextBox>복사</StyledCopyTextBox>
-                    </StyledUrlCopyWrapper>
-                  </StyledShareModalContainer>
-              )
-          }
+          <StyledBack src={Back} onClick={handleBackButtonClick} />
+          <StyledShare
+            src={Share}
+            onClick={handleShareButtonClick}
+            title="공유하기"
+          ></StyledShare>
+          {isShareClicked && (
+            <StyledShareModalContainer onClick={(e) => e.stopPropagation()}>
+              <StyledShareModalTitle>공유하기</StyledShareModalTitle>
+              <StyledDeleteButton
+                src={DeleteIcon}
+                onClick={handleShareModalDeleteButtonClick}
+              ></StyledDeleteButton>
+              <StyledUrlCopyWrapper
+                onClick={() => handleCopyUrlClick(isFcTopData.data.facilityId)}
+              >
+                <StyledUrlTextBox>
+                  {process.env.REACT_APP_LOCAL_URL}p/place/
+                  {isFcTopData.data.facilityId}
+                </StyledUrlTextBox>
+                <StyledCopyTextBox>복사</StyledCopyTextBox>
+              </StyledUrlCopyWrapper>
+            </StyledShareModalContainer>
+          )}
           <KakaoRoadview
             lat={parseFloat(isFcTopData.data.latCrtsVl)}
             lng={parseFloat(isFcTopData.data.lotCrtsVl)}
