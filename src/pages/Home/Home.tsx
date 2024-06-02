@@ -1,9 +1,15 @@
-import {StyledGettingCurLocationBox, StyledGoCurrentImg, StyledMapContainer, StyledGettingCurLocationContainer, StyledGettingCurLocationText} from "./Home.style";
+import {
+  StyledGettingCurLocationBox,
+  StyledGoCurrentImg,
+  StyledMapContainer,
+  StyledGettingCurLocationContainer,
+  StyledGettingCurLocationText,
+} from "./Home.style";
 import { useEffect, useState, useRef } from "react";
-import {SideBar, SideBarHandles} from "../../components/SideBar/SideBar";
+import { SideBar, SideBarHandles } from "../../components/SideBar/SideBar";
 import { getFacilitiesMarkerData } from "../../apis/getFacilitiesMarkerData";
 import MapPin from "../../assets/marker.svg";
-import { renderToStaticMarkup } from "react-dom/server";
+
 import { Overlay } from "../../components/Overlay/Overlay";
 import { useNavigate, useParams } from "react-router-dom";
 import { MarkerDataType, OverlayProps } from "../../types/Map.type";
@@ -11,7 +17,6 @@ import GoCurrent from "../../assets/GoCurrent.svg";
 import CurrentIcon from "../../assets/CurrentMarker.svg";
 import GettingCurLocationLoadingIcon from "../../assets/GettingCurLocationLoading.svg";
 import { getReviewData } from "../../apis/getReviewData";
-import ReactDOM from "react-dom";
 import { createRoot } from "react-dom/client";
 import { parseInt } from "lodash";
 
@@ -37,11 +42,6 @@ export const Home = () => {
     lng: number;
   } | null>(null);
   const currentMarkerRef = useRef<any>(null);
-  const [FocusPosition, setFocusPosition] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
-  const MarkerRef = useRef<any>(null);
   const navigate = useNavigate();
   const [isSideBarData, setIsSideBarData] = useState<any>(null);
   const [isMarkerFetchDone, setIsMarkerFetchDone] = useState(false);
@@ -49,8 +49,10 @@ export const Home = () => {
   const userCurLocationRef = useRef<SideBarHandles>({
     toggleState: () => {},
   });
-  const [goCurrentLocationClicked, setGoCurrentLocationClicked] = useState(false);
-  const [isGettingCurrentLocation, setIsGettingCurrentLocation] = useState(false);
+  const [goCurrentLocationClicked, setGoCurrentLocationClicked] =
+    useState(false);
+  const [isGettingCurrentLocation, setIsGettingCurrentLocation] =
+    useState(false);
 
   useEffect(() => {
     let mapContainer = document.getElementById("map");
@@ -251,7 +253,7 @@ export const Home = () => {
       const position = new window.kakao.maps.LatLng(lat, lng);
       handleMarkerClick(firstFacility.facilityId);
 
-      if (!goCurrentLocationClicked){
+      if (!goCurrentLocationClicked) {
         mapRef.current.panTo(position);
         mapRef.current.setLevel(3);
       }
@@ -275,65 +277,69 @@ export const Home = () => {
 
   const handleCurrentLocation = () => {
     setIsGettingCurrentLocation(true);
-    navigator.geolocation.getCurrentPosition((pos) => {
-      const currentLat = pos.coords.latitude;
-      const currentLng = pos.coords.longitude;
-      const currentPos = new window.kakao.maps.LatLng(currentLat, currentLng);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const currentLat = pos.coords.latitude;
+        const currentLng = pos.coords.longitude;
+        const currentPos = new window.kakao.maps.LatLng(currentLat, currentLng);
 
-      setCurrentPosition({ lat: currentLat, lng: currentLng });
-      mapRef.current.setLevel(2);
+        setCurrentPosition({ lat: currentLat, lng: currentLng });
 
-      if (currentMarkerRef.current) {       // 다른 곳에 CurrentIcon 이 찍혀있을 경우, 새로 불러온 위치로 옮겨온다.
-        currentMarkerRef.current.setPosition(currentPos);
-        currentMarkerRef.current.setMap(mapRef.current);
-      } else {
-        const imageSize = new window.kakao.maps.Size(48, 70);
-        const markerImage = new window.kakao.maps.MarkerImage(
-          CurrentIcon,
-          imageSize
-        );
-        const marker = new window.kakao.maps.Marker({
-          position: currentPos,
-          image: markerImage,
-        });
-        marker.setMap(mapRef.current);
-        currentMarkerRef.current = marker;
+        mapRef.current.setLevel(2);
+
+        if (currentMarkerRef.current) {
+          // 다른 곳에 CurrentIcon 이 찍혀있을 경우, 새로 불러온 위치로 옮겨온다.
+          currentMarkerRef.current.setPosition(currentPos);
+          currentMarkerRef.current.setMap(mapRef.current);
+        } else {
+          const imageSize = new window.kakao.maps.Size(48, 70);
+          const markerImage = new window.kakao.maps.MarkerImage(
+            CurrentIcon,
+            imageSize
+          );
+          const marker = new window.kakao.maps.Marker({
+            position: currentPos,
+            image: markerImage,
+          });
+          marker.setMap(mapRef.current);
+          currentMarkerRef.current = marker;
+        }
+
+        mapRef.current.panTo(currentPos);
+        handleGoCurLocationClick();
+        setIsGettingCurrentLocation(false);
+      }, // 위치 불러오기 오류 시 콜백 함수
+      (error) => {
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            alert("위치 정보 제공을 허용해 주세요.");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            alert("위치 정보를 사용할 수 없습니다. 다른 방법을 시도해 주세요.");
+            break;
+          case error.TIMEOUT:
+            alert(
+              "위치 정보를 가져오는 데 시간이 초과되었습니다. 다시 시도해 주세요."
+            );
+            break;
+          default:
+            alert("알 수 없는 오류가 발생했습니다. 다시 시도해 주세요.");
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 7000,
+        maximumAge: 0,
       }
-
-      mapRef.current.panTo(currentPos);
-      handleGoCurLocationClick();
-      setIsGettingCurrentLocation(false);
-
-    }, // 위치 불러오기 오류 시 콜백 함수
-  (error) => {
-          switch(error.code) {
-            case error.PERMISSION_DENIED:
-              alert("위치 정보 제공을 허용해 주세요.");
-              break;
-            case error.POSITION_UNAVAILABLE:
-              alert("위치 정보를 사용할 수 없습니다. 다른 방법을 시도해 주세요.");
-              break;
-            case error.TIMEOUT:
-              alert("위치 정보를 가져오는 데 시간이 초과되었습니다. 다시 시도해 주세요.");
-              break;
-            default:
-              alert("알 수 없는 오류가 발생했습니다. 다시 시도해 주세요.");
-          }
-
-    },
-{
-          enableHighAccuracy: true,
-          timeout: 7000,
-          maximumAge: 0
-        });
+    );
     setIsGettingCurrentLocation(false);
   };
 
   const handleGoCurLocationClick = () => {
-    if (userCurLocationRef.current){
+    if (userCurLocationRef.current) {
       userCurLocationRef.current.toggleState();
     }
-    if (!goCurrentLocationClicked){
+    if (!goCurrentLocationClicked) {
       setGoCurrentLocationClicked(true);
     }
   };
@@ -347,10 +353,10 @@ export const Home = () => {
     if (targetMarker) {
       const position = targetMarker.getPosition();
 
-      if (!goCurrentLocationClicked){
+      if (!goCurrentLocationClicked) {
         mapRef.current.setCenter(position);
         mapRef.current.setLevel(2);
-      }else{
+      } else {
         setGoCurrentLocationClicked(false);
       }
 
@@ -389,14 +395,18 @@ export const Home = () => {
     <>
       <StyledMapContainer id="map"></StyledMapContainer>
       <StyledGoCurrentImg src={GoCurrent} onClick={handleCurrentLocation} />
-      {
-        isGettingCurrentLocation ? (
-            <StyledGettingCurLocationContainer>
-              <StyledGettingCurLocationBox src={GettingCurLocationLoadingIcon}></StyledGettingCurLocationBox>
-              <StyledGettingCurLocationText>현재 위치 정보를 불러오는 중입니다..</StyledGettingCurLocationText>
-            </StyledGettingCurLocationContainer>
-        ) : <></>
-      }
+      {isGettingCurrentLocation ? (
+        <StyledGettingCurLocationContainer>
+          <StyledGettingCurLocationBox
+            src={GettingCurLocationLoadingIcon}
+          ></StyledGettingCurLocationBox>
+          <StyledGettingCurLocationText>
+            현재 위치 정보를 불러오는 중입니다..
+          </StyledGettingCurLocationText>
+        </StyledGettingCurLocationContainer>
+      ) : (
+        <></>
+      )}
       <SideBar
         keyword={keyword}
         pathFacilityId={facilityId}

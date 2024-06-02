@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes } from "styled-components";
 
 // Keyframes for animations
 const dotAnimation = keyframes`
@@ -63,7 +63,7 @@ export const Container = styled.div`
 `;
 
 export const Dot = styled.div`
-  background: #353B7F;
+  background: #353b7f;
   border-radius: 50%;
   width: 30px;
   height: 30px;
@@ -71,14 +71,14 @@ export const Dot = styled.div`
   bottom: 30px;
   left: 27px;
   transform-origin: center bottom;
-  animation: ${dotAnimation} .4s ease-in-out infinite;
+  animation: ${dotAnimation} 0.4s ease-in-out infinite;
 `;
 
 export const Step = styled.div`
   position: absolute;
   width: 30px;
   height: 30px;
-  border-top: 6px solid #353B7F;
+  border-top: 6px solid #353b7f;
   top: 0;
   right: 0;
   animation: ${stepAnimation} 1.2s linear infinite;
@@ -89,10 +89,9 @@ export const Step1 = styled(Step)`
 `;
 
 export const Step2 = styled(Step)`
-  animation-delay: -.4s;
+  animation-delay: -0.4s;
 `;
 
 export const Step3 = styled(Step)`
   animation-delay: -0.8s;
 `;
-
