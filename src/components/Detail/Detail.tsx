@@ -118,11 +118,10 @@ export const Detail = ({ id, setSelectedFacility }: DetailProps) => {
 
   return (
     <div>
-      <StyledBack src={Back} onClick={handleBackButtonClick} />
-      <StyledShare src={Share} onClick={handleShareButtonClick}></StyledShare>
-
       {isFcTopData ? (
         <>
+        <StyledBack src={Back} onClick={handleBackButtonClick} />
+        <StyledShare src={Share} onClick={handleShareButtonClick}></StyledShare>
           {
               isShareClicked && (
                   <StyledShareModalContainer onClick={(e) => e.stopPropagation()}>

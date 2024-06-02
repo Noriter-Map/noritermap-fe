@@ -65,6 +65,20 @@ export const StyledSearchOptionContainer = styled.div`
   box-shadow: 4px 4px 4px 0px rgba(0, 0, 0, 0.25);
 `;
 
+export const StyledSearchOptionDeleteButton = styled.img`
+  position: absolute;
+  cursor: pointer;   
+  width: 16px;
+  height: 16px;
+  right: 5%;
+  top: 4.2%;
+  
+  transition: scale 0.1s ease;
+  &:hover {
+    scale: 1.1;
+  }
+`;
+
 export const StyledOptionTitle = styled.div`
   font-size: 18px;
   font-weight: 600;

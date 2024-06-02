@@ -26,8 +26,10 @@ import {
   StyledSearchIcon,
   StyledSearchOptionContainer,
   UnderlinedChar,
+  StyledSearchOptionDeleteButton,
 } from "./Search.style";
 import { SearchOptions } from "../../constants/SearchOptions";
+import DeleteIcon from "../../assets/Delete.svg";
 import {
   SearchFacilityListResponses,
   SearchOptionInfo,
@@ -240,6 +242,10 @@ export const Search = forwardRef(
       }
     };
 
+    const handleSearchOptionDeleteButtonClick = () => {
+      setSearchFocus(false);
+    }
+
     useEffect(() => {
       if (pathKeyword !== undefined) {
         if (searchInput.current) {
@@ -265,6 +271,7 @@ export const Search = forwardRef(
         </StyledSearchBarWrapper>
         {searchFocus && (
           <StyledSearchOptionContainer onClick={(e) => e.stopPropagation()}>
+            <StyledSearchOptionDeleteButton src={DeleteIcon} onClick={handleSearchOptionDeleteButtonClick}></StyledSearchOptionDeleteButton>
             <StyledOptionWrapper>
               <StyledOptionTitle>검색 옵션</StyledOptionTitle>
               <UnderlinedChar />
