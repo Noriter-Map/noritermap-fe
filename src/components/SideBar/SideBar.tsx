@@ -159,8 +159,15 @@ export const SideBar = ({
       });
       setIsSideBarData(response);
       setHasMore(!response.data.last);
-    } catch (error) {
-      console.error("Search Error:", error);
+    } catch (error: any) {
+      if (
+        error.code === "ECONNABORTED" ||
+        error.message === "timeout of 500ms exceeded"
+      ) {
+        console.log("요청이 타임아웃되었습니다.");
+      } else {
+        console.error("Search Error:", error);
+      }
       setError("데이터를 불러오는 데 실패했습니다. 다시 시도해 주세요.");
     } finally {
       setLoading(false);
@@ -178,7 +185,7 @@ export const SideBar = ({
     };
 
     const handleGeolocationError = (err: GeolocationPositionError) => {
-      console.warn(`ERROR(${err.code}): ${err.message}`);
+      // console.log(`ERROR(${err.code}): ${err.message}`);
       const defaultLat = 35.160048;
       const defaultLng = 126.851309;
       setIsCurrentLat(defaultLat);
@@ -250,6 +257,8 @@ export const SideBar = ({
       pathFacilityId === undefined
     ) {
       searchRef.current.handleSearch(false);
+
+      // console.log("page > 0");
     }
   }, [page]);
 
@@ -261,6 +270,7 @@ export const SideBar = ({
       pathFacilityId === undefined
     ) {
       fetchSideBarData(isCurrentLat, isCurrentLng, page, keyword);
+      // console.log("fetchSideBarData");
     }
   }, [page, sideBarState, isCurrentLat, isCurrentLng]);
 
@@ -287,6 +297,11 @@ export const SideBar = ({
       }
     }
   }, [pathFacilityId]);
+
+  //   useEffect(() => {
+  //     setPage(0);
+  //     setSideBarSearchData(undefined);
+  //   }, [keyword]);
 
   return (
     <>
