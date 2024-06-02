@@ -57,6 +57,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FetchingCurLocation } from "../FetchingCurLocation/FetchingCurLocation";
 import { parseInt } from "lodash";
+import { defaultLat, defaultLng } from "../../constants/DefaultLatLng";
 
 interface SideBarProps {
   keyword?: string;
@@ -186,8 +187,6 @@ export const SideBar = ({
 
     const handleGeolocationError = (err: GeolocationPositionError) => {
       // console.log(`ERROR(${err.code}): ${err.message}`);
-      const defaultLat = 35.160048;
-      const defaultLng = 126.851309;
       setIsCurrentLat(defaultLat);
       setIsCurrentLng(defaultLng);
       fetchSideBarData(defaultLat, defaultLng, 0, keyword);
@@ -203,21 +202,24 @@ export const SideBar = ({
   }, []);
 
   const handleClickLogo = () => {
+    const initializeOptionsState = () => {
+      setOptionsState({
+        실내외구분: {},
+        설치장소: {},
+        민공구분: {},
+      });
+    };
+
+    initializeOptionsState();
+
     if (isCurrentLat !== null && isCurrentLng !== null) {
-      const initializeOptionsState = () => {
-        setOptionsState({
-          실내외구분: {},
-          설치장소: {},
-          민공구분: {},
-        });
-      };
-
-      initializeOptionsState();
-
       fetchSideBarData(isCurrentLat, isCurrentLng, 0, keyword);
-      setSideBarState("");
-      navigate("/");
+    } else {
+      fetchSideBarData(defaultLat, defaultLng, 0, keyword);
     }
+
+    setSideBarState("");
+    navigate("/");
   };
 
   function formatToOneDecimalPlace(number: number) {
@@ -263,13 +265,12 @@ export const SideBar = ({
   }, [page]);
 
   useEffect(() => {
-    if (
-      sideBarState !== "search" &&
-      isCurrentLat !== null &&
-      isCurrentLng !== null &&
-      pathFacilityId === undefined
-    ) {
-      fetchSideBarData(isCurrentLat, isCurrentLng, page, keyword);
+    if (sideBarState !== "search" && pathFacilityId === undefined) {
+      if (isCurrentLat !== null && isCurrentLng !== null) {
+        fetchSideBarData(isCurrentLat, isCurrentLng, page, keyword);
+      } else {
+        fetchSideBarData(defaultLat, defaultLat, page, keyword);
+      }
       // console.log("fetchSideBarData");
     }
   }, [page, sideBarState, isCurrentLat, isCurrentLng]);
