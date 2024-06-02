@@ -17,7 +17,7 @@ export function Router() {
       <ToastContainer
         style={{ width: "448px" }}
         position="top-left"
-        autoClose={1000}
+        autoClose={100}
         draggable
         hideProgressBar={false}
         closeOnClick

@@ -62,7 +62,7 @@ export const Overlay = ({
       {OverlayData && (
         <CustomOverlay>
           <HiddenId>{facility_id}</HiddenId>
-          <Title>{pfct_nm}</Title>
+          <Title onClick={() => onDetailClick(facility_id)}>{pfct_nm}</Title>
           <Rating>
             <RatingValue>
               {formatToOneDecimalPlace(OverlayData.rating)}

@@ -45,8 +45,10 @@ export const StyledSearchIcon = styled.img`
   transform: translateY(-43%);
   width: 42px;
   height: auto;
+  
+  transition: scale 0.2s ease;
   &:hover {
-    width: 50px;
+    scale: 1.1;
   }
   cursor: pointer;
 `;

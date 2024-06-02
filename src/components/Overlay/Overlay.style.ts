@@ -29,6 +29,8 @@ export const Title = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  pointer-events: auto;
+  cursor: pointer;
 `;
 
 export const Rating = styled.div`

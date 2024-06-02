@@ -7,8 +7,16 @@ import {
   StyledTopTitle,
   StyledTopTitleContainer,
   StyledTopWrapper,
+    StyledShare,
+  StyledShareModalContainer,
+  StyledShareModalTitle,
+  StyledDeleteButton,
+  StyledUrlCopyWrapper,
+  StyledUrlTextBox,
+  StyledCopyTextBox
 } from "./Detail.style";
 import Back from "../../assets/BackIcon.svg";
+import Share from "../../assets/Share.svg"
 import { useNavigate } from "react-router-dom";
 import { FacilityInfoTop, SearchFacility } from "../../types/SearchOption.type";
 import { getFcInfoTop } from "../../apis/getFcInfoTop";
@@ -28,6 +36,7 @@ import {
 import RoNmIcon from "../../assets/RoNmIcon.svg";
 import ClipBoard from "../../assets/ClipBoardIcon.svg";
 import StarIcon from "../../assets/StarIcon.svg";
+import DeleteIcon from "../../assets/Delete.svg";
 import { DetailInfoTab } from "./DetailInfoTab/DetailInfoTab";
 import { Review } from "./Review/Review";
 import { toast } from "react-toastify";
@@ -43,6 +52,7 @@ export const Detail = ({ id, setSelectedFacility }: DetailProps) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [isUpdate, setIsUpdate] = useState(false);
+  const [isShareClicked, setIsShareClicked] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,6 +88,30 @@ export const Detail = ({ id, setSelectedFacility }: DetailProps) => {
     navigate(-1);
   };
 
+  const handleShareButtonClick = () => {
+    if (isShareClicked){
+      setIsShareClicked(false);
+    }else{
+      setIsShareClicked(true);
+    }
+  }
+
+  const handleShareModalDeleteButtonClick = () => {
+    if (isShareClicked){
+      setIsShareClicked(false);
+    }
+  }
+
+  const handleCopyUrlClick = async (facilityId: number) => {
+    try {
+      await navigator.clipboard.writeText(`${process.env.REACT_APP_LOCAL_URL}p/place/${facilityId}`);
+      toast("주소가 복사되었습니다. ✨");
+      toast.clearWaitingQueue();
+    } catch (e) {
+      toast("주소 복사에 실패하였습니다. 🚨");
+    }
+  }
+
   function formatToOneDecimalPlace(number: number) {
     return number.toFixed(1);
   }
@@ -85,8 +119,22 @@ export const Detail = ({ id, setSelectedFacility }: DetailProps) => {
   return (
     <div>
       <StyledBack src={Back} onClick={handleBackButtonClick} />
+      <StyledShare src={Share} onClick={handleShareButtonClick}></StyledShare>
+
       {isFcTopData ? (
         <>
+          {
+              isShareClicked && (
+                  <StyledShareModalContainer onClick={(e) => e.stopPropagation()}>
+                    <StyledShareModalTitle>공유하기</StyledShareModalTitle>
+                    <StyledDeleteButton src={DeleteIcon} onClick={handleShareModalDeleteButtonClick}></StyledDeleteButton>
+                    <StyledUrlCopyWrapper onClick={() => handleCopyUrlClick(isFcTopData.data.facilityId)}>
+                      <StyledUrlTextBox>{process.env.REACT_APP_LOCAL_URL}p/place/{isFcTopData.data.facilityId}</StyledUrlTextBox>
+                      <StyledCopyTextBox>복사</StyledCopyTextBox>
+                    </StyledUrlCopyWrapper>
+                  </StyledShareModalContainer>
+              )
+          }
           <KakaoRoadview
             lat={parseFloat(isFcTopData.data.latCrtsVl)}
             lng={parseFloat(isFcTopData.data.lotCrtsVl)}
