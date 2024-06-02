@@ -105,10 +105,10 @@ export const Detail = ({ id, setSelectedFacility }: DetailProps) => {
   const handleCopyUrlClick = async (facilityId: number) => {
     try {
       await navigator.clipboard.writeText(`${process.env.REACT_APP_LOCAL_URL}p/place/${facilityId}`);
-      toast("주소가 복사되었습니다. ✨");
+      toast("링크가 복사되었습니다. ✨\n");
       toast.clearWaitingQueue();
     } catch (e) {
-      toast("주소 복사에 실패하였습니다. 🚨");
+      toast("링크 복사에 실패하였습니다. 🚨");
     }
   }
 
