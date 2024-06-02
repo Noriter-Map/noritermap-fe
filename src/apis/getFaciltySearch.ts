@@ -27,6 +27,7 @@ export const getFaciltySearch = async ({
         page,
         size,
       },
+      timeout: 5000,
     }
   );
 
