@@ -143,6 +143,7 @@ export const SideBar = ({
     try {
       const response = await getFaciltySearch(queryParams);
       const myposition = await getMyPosition(lat, lng);
+
       setIsMyRegion(myposition);
 
       setSideBarData((prevData) => {
@@ -269,7 +270,7 @@ export const SideBar = ({
       if (isCurrentLat !== null && isCurrentLng !== null) {
         fetchSideBarData(isCurrentLat, isCurrentLng, page, keyword);
       } else {
-        fetchSideBarData(defaultLat, defaultLat, page, keyword);
+        fetchSideBarData(defaultLat, defaultLng, page, keyword);
       }
       // console.log("fetchSideBarData");
     }
