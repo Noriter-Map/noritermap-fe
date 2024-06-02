@@ -121,7 +121,7 @@ export const Detail = ({ id, setSelectedFacility }: DetailProps) => {
       {isFcTopData ? (
         <>
         <StyledBack src={Back} onClick={handleBackButtonClick} />
-        <StyledShare src={Share} onClick={handleShareButtonClick}></StyledShare>
+        <StyledShare src={Share} onClick={handleShareButtonClick} title="공유하기"></StyledShare>
           {
               isShareClicked && (
                   <StyledShareModalContainer onClick={(e) => e.stopPropagation()}>

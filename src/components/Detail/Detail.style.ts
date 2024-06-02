@@ -89,7 +89,7 @@ export const StyledShare = styled.img`
   border-radius: 3px;
   right: 8px;
   
-    transition: scale 0.2s ease;
+  transition: scale 0.2s ease;
   &:hover {
     scale: 1.05;
   } 
