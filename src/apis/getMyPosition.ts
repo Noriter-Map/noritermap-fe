@@ -3,7 +3,7 @@ import { MyRegionResponses } from "../types/Map.type";
 
 export const getMyPosition = async (y: number, x: number) => {
   const response = await axios.get<MyRegionResponses>(
-    `https://tsrksh1ifh.execute-api.ap-northeast-2.amazonaws.com/region/api`,
+    process.env.REACT_APP_LAMBDA_GET_CUR_LOCATION ? process.env.REACT_APP_LAMBDA_GET_CUR_LOCATION : "",
     {
       headers: {
         "x-api-key": process.env.REACT_APP_LAMBDA_API_KEY,
