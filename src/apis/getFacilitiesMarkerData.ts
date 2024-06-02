@@ -1,6 +1,6 @@
-import { local } from "./client";
+import {awsS3} from "./client";
 
 export const getFacilitiesMarkerData = async () => {
-  const response = await local.get(`data/marker_data.json`);
+  const response = await awsS3.get("");
   return response.data;
 };
