@@ -1,6 +1,6 @@
-import { StyledGoCurrentImg, StyledMapContainer } from "./Home.style";
+import {StyledGettingCurLocationBox, StyledGoCurrentImg, StyledMapContainer, StyledGettingCurLocationContainer, StyledGettingCurLocationText} from "./Home.style";
 import { useEffect, useState, useRef } from "react";
-import { SideBar } from "../../components/SideBar/SideBar";
+import {SideBar, SideBarHandles} from "../../components/SideBar/SideBar";
 import { getFacilitiesMarkerData } from "../../apis/getFacilitiesMarkerData";
 import MapPin from "../../assets/marker.svg";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -9,6 +9,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { MarkerDataType, OverlayProps } from "../../types/Map.type";
 import GoCurrent from "../../assets/GoCurrent.svg";
 import CurrentIcon from "../../assets/CurrentMarker.svg";
+import GettingCurLocationLoadingIcon from "../../assets/GettingCurLocationLoading.svg";
 import { getReviewData } from "../../apis/getReviewData";
 import ReactDOM from "react-dom";
 import { createRoot } from "react-dom/client";
@@ -45,6 +46,11 @@ export const Home = () => {
   const [isSideBarData, setIsSideBarData] = useState<any>(null);
   const [isMarkerFetchDone, setIsMarkerFetchDone] = useState(false);
   const [isSearchMarkerFetchDone, setIsSearchMarkerFetchDone] = useState(false);
+  const userCurLocationRef = useRef<SideBarHandles>({
+    toggleState: () => {},
+  });
+  const [goCurrentLocationClicked, setGoCurrentLocationClicked] = useState(false);
+  const [isGettingCurrentLocation, setIsGettingCurrentLocation] = useState(false);
 
   useEffect(() => {
     let mapContainer = document.getElementById("map");
@@ -244,8 +250,11 @@ export const Home = () => {
       const lng = parseFloat(firstFacility.lotCrtsVl);
       const position = new window.kakao.maps.LatLng(lat, lng);
       handleMarkerClick(firstFacility.facilityId);
-      mapRef.current.panTo(position);
-      mapRef.current.setLevel(3);
+
+      if (!goCurrentLocationClicked){
+        mapRef.current.panTo(position);
+        mapRef.current.setLevel(3);
+      }
 
       // 해당 마커 찾기 및 보이기
       const marker = markersRef.current.find(
@@ -265,6 +274,7 @@ export const Home = () => {
   }, [facilityId, isMarkerFetchDone]);
 
   const handleCurrentLocation = () => {
+    setIsGettingCurrentLocation(true);
     navigator.geolocation.getCurrentPosition((pos) => {
       const currentLat = pos.coords.latitude;
       const currentLng = pos.coords.longitude;
@@ -273,8 +283,9 @@ export const Home = () => {
       setCurrentPosition({ lat: currentLat, lng: currentLng });
       mapRef.current.setLevel(2);
 
-      if (currentMarkerRef.current) {
+      if (currentMarkerRef.current) {       // 다른 곳에 CurrentIcon 이 찍혀있을 경우, 새로 불러온 위치로 옮겨온다.
         currentMarkerRef.current.setPosition(currentPos);
+        currentMarkerRef.current.setMap(mapRef.current);
       } else {
         const imageSize = new window.kakao.maps.Size(48, 70);
         const markerImage = new window.kakao.maps.MarkerImage(
@@ -290,9 +301,44 @@ export const Home = () => {
       }
 
       mapRef.current.panTo(currentPos);
-    });
+      handleGoCurLocationClick();
+      setIsGettingCurrentLocation(false);
+
+    }, // 위치 불러오기 오류 시 콜백 함수
+  (error) => {
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              alert("위치 정보 제공을 허용해 주세요.");
+              break;
+            case error.POSITION_UNAVAILABLE:
+              alert("위치 정보를 사용할 수 없습니다. 다른 방법을 시도해 주세요.");
+              break;
+            case error.TIMEOUT:
+              alert("위치 정보를 가져오는 데 시간이 초과되었습니다. 다시 시도해 주세요.");
+              break;
+            default:
+              alert("알 수 없는 오류가 발생했습니다. 다시 시도해 주세요.");
+          }
+
+    },
+{
+          enableHighAccuracy: true,
+          timeout: 7000,
+          maximumAge: 0
+        });
+    setIsGettingCurrentLocation(false);
   };
 
+  const handleGoCurLocationClick = () => {
+    if (userCurLocationRef.current){
+      userCurLocationRef.current.toggleState();
+    }
+    if (!goCurrentLocationClicked){
+      setGoCurrentLocationClicked(true);
+    }
+  };
+
+  // /p/place/:id 로 접속하면, 본 함수를 호출하여, 마커를 클릭한 것처럼 처리한다. 따라서 Side Effect 고려할 것.
   const handleMarkerClick = (facilityId: number) => {
     const targetMarker = markersRef.current.find(
       (marker) => marker.facilityId === facilityId.toString()
@@ -301,8 +347,12 @@ export const Home = () => {
     if (targetMarker) {
       const position = targetMarker.getPosition();
 
-      mapRef.current.setCenter(position);
-      mapRef.current.setLevel(2);
+      if (!goCurrentLocationClicked){
+        mapRef.current.setCenter(position);
+        mapRef.current.setLevel(2);
+      }else{
+        setGoCurrentLocationClicked(false);
+      }
 
       // 클릭된 마커가 없다면, targetMarker 를 클릭처리한다.
       if (clickedMarkerAndOverlayRef.current === null) {
@@ -337,14 +387,22 @@ export const Home = () => {
 
   return (
     <>
-      <StyledMapContainer id="map">
-        <StyledGoCurrentImg src={GoCurrent} onClick={handleCurrentLocation} />
-      </StyledMapContainer>
+      <StyledMapContainer id="map"></StyledMapContainer>
+      <StyledGoCurrentImg src={GoCurrent} onClick={handleCurrentLocation} />
+      {
+        isGettingCurrentLocation ? (
+            <StyledGettingCurLocationContainer>
+              <StyledGettingCurLocationBox src={GettingCurLocationLoadingIcon}></StyledGettingCurLocationBox>
+              <StyledGettingCurLocationText>현재 위치 정보를 불러오는 중입니다..</StyledGettingCurLocationText>
+            </StyledGettingCurLocationContainer>
+        ) : <></>
+      }
       <SideBar
         keyword={keyword}
         pathFacilityId={facilityId}
         onMarkerClick={handleMarkerClick}
         setIsSideBarData={setIsSideBarData}
+        ref={userCurLocationRef}
       />
     </>
   );

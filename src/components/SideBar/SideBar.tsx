@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, {useEffect, useState, useRef, useCallback, useImperativeHandle, forwardRef, Ref} from "react";
 import {
   StyledExpandButton,
   SidebarContainer,
@@ -66,12 +66,21 @@ interface SideBarProps {
   setIsSideBarData: React.Dispatch<React.SetStateAction<any>>;
 }
 
-export const SideBar = ({
-  keyword,
-  pathFacilityId,
-  onMarkerClick,
-  setIsSideBarData,
-}: SideBarProps) => {
+export interface SideBarHandles {
+  toggleState: () => void;
+}
+
+
+export const SideBar = forwardRef<SideBarHandles, SideBarProps>(
+    (
+    {
+      keyword,
+      pathFacilityId,
+      onMarkerClick,
+      setIsSideBarData,
+    }: SideBarProps,
+    homeRef
+    ) => {
   const [isOpen, setisOpen] = useState(true);
   const [sideBarData, setSideBarData] = useState<
     SearchFacilityListResponses | undefined
@@ -96,6 +105,13 @@ export const SideBar = ({
   const searchRef = useRef<{ handleSearch: (resetPage: boolean) => void }>(
     null
   );
+  const [userCurLocationState, setUserCurLocationState] = useState(false);
+
+  useImperativeHandle(homeRef, () => ({
+    toggleState(){
+      setUserCurLocationState((prevState) => !prevState);
+    },
+  }));
 
   const handleButtonClick = () => {
     setisOpen(!isOpen);
@@ -176,6 +192,7 @@ export const SideBar = ({
     }
   };
 
+  // 현재 위치 이동하기 버튼 클릭을 통해 재렌더링 되는 사이드바는, Home 의 재렌더링을 유발하지 않도록 setIsSideBarState 를 호출하지 않는다
   useEffect(() => {
     const handleGeolocationSuccess = (pos: GeolocationPosition) => {
       const currentLat = pos.coords.latitude;
@@ -183,7 +200,6 @@ export const SideBar = ({
       setIsCurrentLat(currentLat);
       setIsCurrentLng(currentLng);
       fetchSideBarData(currentLat, currentLng, 0, keyword);
-      setSideBarState("");
     };
 
     const handleGeolocationError = (err: GeolocationPositionError) => {
@@ -191,16 +207,22 @@ export const SideBar = ({
       setIsCurrentLat(defaultLat);
       setIsCurrentLng(defaultLng);
       fetchSideBarData(defaultLat, defaultLng, 0, keyword);
-      setSideBarState("");
     };
 
     if (isOpen && pathFacilityId === undefined) {
       navigator.geolocation.getCurrentPosition(
-        handleGeolocationSuccess,
-        handleGeolocationError
+          handleGeolocationSuccess,
+          handleGeolocationError,
+          {
+            enableHighAccuracy: true,
+            timeout: 7000,
+            maximumAge: 0
+          }
       );
+
+      setSideBarState("");
     }
-  }, []);
+  }, [userCurLocationState]);
 
   const handleClickLogo = () => {
     const initializeOptionsState = () => {
@@ -510,4 +532,5 @@ export const SideBar = ({
       ></StyledExpandButton>
     </>
   );
-};
+}
+);
