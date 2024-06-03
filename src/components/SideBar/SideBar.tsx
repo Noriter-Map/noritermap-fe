@@ -258,12 +258,7 @@ export const SideBar = forwardRef<SideBarHandles, SideBarProps>(
 
     const lastFacilityElementRef = useCallback(
       (node: HTMLElement | null) => {
-        if (
-          loading ||
-          !hasMore ||
-          (currentSideBarData && currentSideBarData?.data.content.length < 10)
-        )
-          return;
+        if (loading || !hasMore) return;
 
         if (observer.current) observer.current.disconnect();
 
@@ -285,14 +280,24 @@ export const SideBar = forwardRef<SideBarHandles, SideBarProps>(
         searchRef.current &&
         pathFacilityId === undefined
       ) {
-        searchRef.current.handleSearch(false);
-
-        // console.log("page > 0");
-      } else if (sideBarState === "search" && page === 0 && searchRef.current) {
-        searchRef.current.handleSearch(true);
-        // console.log("page === 0");
+        searchRef.current.handleSearch(page === 0);
       }
+      // } else if (sideBarState === "search" && page === 0 && searchRef.current) {
+      //   searchRef.current.handleSearch(false);
+      //   setPage((prevPage) => prevPage + 1);
+      //   console.log("page === 0");
+      // }
     }, [page]);
+
+    // useEffect(() => {
+    //   if (
+    //     sideBarState === "search" &&
+    //     searchRef.current &&
+    //     keyword === undefined
+    //   ) {
+    //     searchRef.current.handleSearch(page === 0);
+    //   }
+    // }, [page, sideBarState, keyword]);
 
     useEffect(() => {
       if (sideBarState !== "search" && pathFacilityId === undefined) {
@@ -301,7 +306,6 @@ export const SideBar = forwardRef<SideBarHandles, SideBarProps>(
         } else {
           fetchSideBarData(defaultLat, defaultLng, page, keyword);
         }
-        // console.log("fetchSideBarData");
       }
     }, [page, sideBarState, isCurrentLat, isCurrentLng]);
 
@@ -347,6 +351,7 @@ export const SideBar = forwardRef<SideBarHandles, SideBarProps>(
               ref={searchRef}
               pathKeyword={keyword}
               setPage={setPage}
+              page={page}
             />
           </StyledTopDiv>
           {selectedFacility && sideBarState === "detail" ? (

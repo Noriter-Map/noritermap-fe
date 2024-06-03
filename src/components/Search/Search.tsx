@@ -53,6 +53,7 @@ interface SearchProps {
   sideBarSearchData: SearchFacilityListResponses | undefined;
   pathKeyword: string | undefined;
   setPage: Dispatch<SetStateAction<number>>;
+  page: number;
 }
 
 export const Search = forwardRef(
@@ -65,6 +66,7 @@ export const Search = forwardRef(
       sideBarSearchData,
       pathKeyword,
       setPage,
+      page,
     }: SearchProps,
     ref
   ) => {
@@ -78,7 +80,6 @@ export const Search = forwardRef(
     const [isCurrentLat, setIsCurrentLat] = useState<number | null>(null);
     const [isCurrentLng, setIsCurrentLng] = useState<number | null>(null);
     const [sideBarState, setSideBarState] = useRecoilState(SideBarState);
-    const [page, setPageState] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const navigate = useNavigate();
 
@@ -171,7 +172,7 @@ export const Search = forwardRef(
       setIsCurrentLng(currentLng);
     });
 
-    const handleSearch = async (resetPage: boolean = true) => {
+    const handleSearch = async (resetPage: boolean) => {
       setSearchFocus(false);
       setIsLoading(true);
       setSideBarState("search");
@@ -200,19 +201,23 @@ export const Search = forwardRef(
         if (keyword !== pathKeyword && resetPage) {
           setSideBarSearchData(response);
           setIsSideBarData(response);
-          setPage(0);
+          setPage((prevPage) => prevPage + 1);
         } else {
           setSideBarSearchData(
             (prevData: SearchFacilityListResponses | undefined) => {
-              if (prevData) {
+              if (prevData && pageNumber > 0) {
+                const newContent = response.data.content.filter(
+                  (newItem) =>
+                    !prevData.data.content.some(
+                      (prevItem) => prevItem.facilityId === newItem.facilityId
+                    )
+                );
+
                 return {
-                  ...response,
+                  ...prevData,
                   data: {
-                    ...response.data,
-                    content: [
-                      ...prevData.data.content,
-                      ...response.data.content,
-                    ],
+                    ...prevData.data,
+                    content: [...prevData.data.content, ...newContent],
                   },
                 };
               } else {
@@ -236,7 +241,7 @@ export const Search = forwardRef(
 
     const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === "Enter") {
-        handleSearch();
+        handleSearch(true);
       }
     };
 
@@ -256,7 +261,10 @@ export const Search = forwardRef(
     return (
       <StyledContainer>
         <StyledSearchBarWrapper ref={searchWrap}>
-          <StyledSearchIcon src={SearchIcon} onClick={() => handleSearch()} />
+          <StyledSearchIcon
+            src={SearchIcon}
+            onClick={() => handleSearch(true)}
+          />
           <StyledSearchBar
             ref={searchInput}
             placeholder="놀이시설 검색"
