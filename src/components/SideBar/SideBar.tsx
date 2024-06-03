@@ -288,6 +288,9 @@ export const SideBar = forwardRef<SideBarHandles, SideBarProps>(
         searchRef.current.handleSearch(false);
 
         // console.log("page > 0");
+      } else if (sideBarState === "search" && page === 0 && searchRef.current) {
+        searchRef.current.handleSearch(true);
+        // console.log("page === 0");
       }
     }, [page]);
 
@@ -326,10 +329,9 @@ export const SideBar = forwardRef<SideBarHandles, SideBarProps>(
       }
     }, [pathFacilityId]);
 
-    //   useEffect(() => {
-    //     setPage(0);
-    //     setSideBarSearchData(undefined);
-    //   }, [keyword]);
+    useEffect(() => {
+      setPage(0);
+    }, [keyword]);
 
     return (
       <>

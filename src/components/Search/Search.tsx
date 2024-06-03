@@ -204,9 +204,7 @@ export const Search = forwardRef(
         } else {
           setSideBarSearchData(
             (prevData: SearchFacilityListResponses | undefined) => {
-              if (resetPage) {
-                return response;
-              } else if (prevData) {
+              if (prevData) {
                 return {
                   ...response,
                   data: {
@@ -244,7 +242,7 @@ export const Search = forwardRef(
 
     const handleSearchOptionDeleteButtonClick = () => {
       setSearchFocus(false);
-    }
+    };
 
     useEffect(() => {
       if (pathKeyword !== undefined) {
@@ -271,7 +269,10 @@ export const Search = forwardRef(
         </StyledSearchBarWrapper>
         {searchFocus && (
           <StyledSearchOptionContainer onClick={(e) => e.stopPropagation()}>
-            <StyledSearchOptionDeleteButton src={DeleteIcon} onClick={handleSearchOptionDeleteButtonClick}></StyledSearchOptionDeleteButton>
+            <StyledSearchOptionDeleteButton
+              src={DeleteIcon}
+              onClick={handleSearchOptionDeleteButtonClick}
+            ></StyledSearchOptionDeleteButton>
             <StyledOptionWrapper>
               <StyledOptionTitle>검색 옵션</StyledOptionTitle>
               <UnderlinedChar />
