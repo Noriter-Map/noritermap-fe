@@ -54,6 +54,7 @@ interface SearchProps {
   pathKeyword: string | undefined;
   setPage: Dispatch<SetStateAction<number>>;
   page: number;
+  setHasMore: Dispatch<SetStateAction<boolean>>;
 }
 
 export const Search = forwardRef(
@@ -67,6 +68,7 @@ export const Search = forwardRef(
       pathKeyword,
       setPage,
       page,
+      setHasMore,
     }: SearchProps,
     ref
   ) => {
@@ -80,7 +82,6 @@ export const Search = forwardRef(
     const [isCurrentLat, setIsCurrentLat] = useState<number | null>(null);
     const [isCurrentLng, setIsCurrentLng] = useState<number | null>(null);
     const [sideBarState, setSideBarState] = useRecoilState(SideBarState);
-    const [hasMore, setHasMore] = useState(true);
     const navigate = useNavigate();
 
     const clickWrap = (event: MouseEvent) => {
@@ -176,6 +177,10 @@ export const Search = forwardRef(
       setSearchFocus(false);
       setIsLoading(true);
       setSideBarState("search");
+
+      if (resetPage) {
+        setPage(0);
+      }
 
       const keyword = searchInput.current?.value || "";
       const curLatitude = isCurrentLat;

@@ -335,7 +335,7 @@ export const SideBar = forwardRef<SideBarHandles, SideBarProps>(
 
     useEffect(() => {
       setPage(0);
-    }, [keyword]);
+    }, [keyword, optionsState]);
 
     return (
       <>
@@ -352,6 +352,7 @@ export const SideBar = forwardRef<SideBarHandles, SideBarProps>(
               pathKeyword={keyword}
               setPage={setPage}
               page={page}
+              setHasMore={setHasMore}
             />
           </StyledTopDiv>
           {selectedFacility && sideBarState === "detail" ? (
