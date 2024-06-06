@@ -95,7 +95,12 @@ export const Detail = ({ id, setSelectedFacility }: DetailProps) => {
       if (searchState) {
         const searchKeyword = location.state?.searchKeyword || "";
         setSideBarState("search");
-        navigate(`/search/${searchKeyword}`);
+        if (searchKeyword) {
+          navigate(`/search/${searchKeyword}`);
+        } else {
+          setSideBarState("");
+          navigate("/");
+        }
       } else {
         setSideBarState("");
         navigate("/");
